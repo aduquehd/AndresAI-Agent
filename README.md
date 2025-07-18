@@ -1,41 +1,94 @@
-# Chat agent
+# AI Agent Chatbot
 
-## Development
+A production-ready AI chatbot system built with FastAPI that supports web interfaces. The system uses OpenAI for AI capabilities and PostgreSQL with pgvector for semantic search in the knowledge base.
 
-- `docker compose -f docker-compose.yml build`
+## Features
 
-- Create a `.env` file: 
-```dotenv
-OPENAI_API_KEY=YOUR-TOKEN
-LOGFIRE_TOKEN=LOGFIRE-TOKEN
-DB_CONNECTION_STRING=postgresql+asyncpg://postgres:postgres@db/postgres
+- 🤖 AI-powered conversational interface
+- 🌐 Modern web chat UI with real-time streaming
+- 🔍 Semantic search with vector embeddings
+- 📊 Admin panel for knowledge base management
+- 🔒 Secure authentication and session management
+- 🐳 Full Docker containerization
 
-ADMIN_USER='admin'
-ADMIN_PASSWORD='your-password'
-FASTAPI_ADMIN_SECRET_KEY='your-secret-key'
+## Prerequisites
+
+- Docker and Docker Compose
+- Node.js and npm (for TypeScript compilation)
+- OpenAI API key
+
+## Quick Start
+
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd AI_agent
 ```
 
-- `docker compose -f docker-compose.yml up`
+2. **Install dependencies**
+```bash
+npm install
+npm run build
+```
 
-- Set up the pgvector extension:
-  - Run `docker exec -it ai_agent_db psql -U postgres -d postgres`
-  - Run `CREATE EXTENSION IF NOT EXISTS vector;`
-  - Close the session typing `\q`.
-  - Stop Docker compose and run it again
-    - `docker compose -f docker-compose.yml stop`
-    - `docker compose -f docker-compose.yml up`
+3. **Create environment file**
+Copy `.env.example` to `.env` and fill in your values:
+```bash
+cp .env.example .env
+```
 
+Edit `.env` with your configuration:
+```dotenv
+OPENAI_API_KEY=sk-proj-your-openai-api-key-here
+LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
+DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
 
-- Go to `http://localhost:8000/chat-ui/{user-id}`
+# Database credentials
+POSTGRES_USER=chat_user
+POSTGRES_PASSWORD=your_secure_password
+POSTGRES_DB=chat_agent_db
+
+# Admin configuration
+ADMIN_USER=admin
+ADMIN_PASSWORD=your_secure_admin_password
+FASTAPI_ADMIN_SECRET_KEY=your_secret_key_here_32_chars_min
+
+# Application
+APP_ENV=development
+DEBUG=false
+```
+
+4. **Build and start the services**
+```bash
+docker compose build
+docker compose up
+```
+
+5. **Set up the pgvector extension**
+In another terminal, run:
+```bash
+docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db
+```
+Then execute:
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+\q
+```
+
+6. **Access the application**
+- Chat UI: http://localhost:8000/chat
+- Admin panel: http://localhost:8000/admin
+
+## Development
 
 
 ## Local DB connect.
 
-To connect to the database locally, connect using `jdbc:postgresql://localhost:5432/postgres`.
+To connect to the database locally, connect using `jdbc:postgresql://localhost:5432/chat_agent_db` with username `chat_user`.
 
 ## Running the project properly.
 
-The agent can be used through the web UI at `http://localhost:8000/chat-ui/{user-id}`.
+The agent can be used through the web UI at `http://localhost:8000/chat`. Each visitor is automatically assigned a unique UUID stored in localStorage, keeping conversations separate and persistent across sessions.
 
 ## Configuring the Agent
 
@@ -73,8 +126,14 @@ PD: You may need to use `sudo` in all docker commands, like `sudo docker compose
 ```dotenv
 OPENAI_API_KEY=YOUR-TOKEN
 LOGFIRE_TOKEN=LOGFIRE-TOKEN
-DB_CONNECTION_STRING=postgresql+asyncpg://postgres:postgres@db/postgres
+DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_password@db/chat_agent_db
 
+# Database credentials
+POSTGRES_USER=chat_user
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=chat_agent_db
+
+# Admin configuration
 ADMIN_USER='admin'
 ADMIN_PASSWORD='your-password'
 FASTAPI_ADMIN_SECRET_KEY='your-secret-key'
@@ -83,10 +142,10 @@ FASTAPI_ADMIN_SECRET_KEY='your-secret-key'
 - `docker compose -f docker-compose.prod.yml build`
 - `docker compose -f docker-compose.prod.yml up`
 - Set up the pgvector extension:
-  - Run `docker exec -it ai_agent_db psql -U postgres -d postgres`
+  - Run `docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db`
   - Run `CREATE EXTENSION IF NOT EXISTS vector;`
   - Close the session typing `\q`.
-- Let's try opening the URL `{domain}/chat-ui/{user-id}`.
+- Let's try opening the URL `{domain}/chat`.
 
 ## Re-deployment
 To deploy any changes, just run the script `source deploy-server.sh`
@@ -94,22 +153,22 @@ To deploy any changes, just run the script `source deploy-server.sh`
 ## Optionally setup Supervisor to run the project.
 
 - `sudo apt install supervisor -y`
-- Create a conf file: `sudo nano /etc/supervisor/conf.d/chat_agent.conf`
+- Create a conf file: `sudo nano /etc/supervisor/conf.d/ai_agent.conf`
 ```
-[program:chat_agent]
+[program:ai_agent]
 directory=/home/ubuntu/chat-agent
 command=sudo /usr/bin/docker compose -f docker-compose.prod.yml up
 autostart=true
 autorestart=true
-stderr_logfile=/var/log/chat_agent.err.log
-stdout_logfile=/var/log/chat_agent.out.log
+stderr_logfile=/var/log/ai_agent.err.log
+stdout_logfile=/var/log/ai_agent.out.log
 ```
 - `sudo supervisorctl reread`
 - `sudo supervisorctl update`
-- `sudo supervisorctl start chat_agent`
-- PD: The logs can be shown at `sudo tail -f /var/log/chat_agent.out.log`.
+- `sudo supervisorctl start ai_agent`
+- PD: The logs can be shown at `sudo tail -f /var/log/ai_agent.out.log`.
 
-If you would like to see better logs for debugging, stop supervisor
+If you would like to see better logs for debugging, stop ai_agent
 and run docker compose manually.
-- `sudo supervisorctl stop chat_agent`
+- `sudo supervisorctl stop ai_agent`
 - `docker compose -f docker-compose.prod.yml up`
