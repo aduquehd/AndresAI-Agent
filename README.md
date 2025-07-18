@@ -39,21 +39,24 @@ cp .env.example .env
 
 Edit `.env` with your configuration:
 ```dotenv
+# OpenAI API Configuration
 OPENAI_API_KEY=sk-proj-your-openai-api-key-here
-LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
-DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
 
-# Database credentials
+# Logfire Configuration (optional - for observability)
+LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
+
+# Database Configuration
+DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/ai_agent_db
 POSTGRES_USER=chat_user
 POSTGRES_PASSWORD=your_secure_password
-POSTGRES_DB=chat_agent_db
+POSTGRES_DB=ai_agent_db
 
-# Admin configuration
+# FastAPI Admin
 ADMIN_USER=admin
-ADMIN_PASSWORD=your_secure_admin_password
-FASTAPI_ADMIN_SECRET_KEY=your_secret_key_here_32_chars_min
+ADMIN_PASSWORD='your_secure_admin_password'
+FASTAPI_ADMIN_SECRET_KEY='your_secret_key_here_32_chars_min'
 
-# Application
+# Application Configuration
 APP_ENV=development
 DEBUG=false
 ```
@@ -67,7 +70,7 @@ docker compose up
 5. **Set up the pgvector extension**
 In another terminal, run:
 ```bash
-docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db
+docker exec -it ai_agent_db psql -U chat_user -d ai_agent_db
 ```
 Then execute:
 ```sql
@@ -84,7 +87,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 ## Local DB connect.
 
-To connect to the database locally, connect using `jdbc:postgresql://localhost:5432/chat_agent_db` with username `chat_user`.
+To connect to the database locally, connect using `jdbc:postgresql://localhost:5432/ai_agent_db` with username `chat_user`.
 
 ## Running the project properly.
 
@@ -124,25 +127,32 @@ PD: You may need to use `sudo` in all docker commands, like `sudo docker compose
 - Create a `.env` file:
 - Make sure the domain at `compose/prod/Caddyfile` is correct.
 ```dotenv
-OPENAI_API_KEY=YOUR-TOKEN
-LOGFIRE_TOKEN=LOGFIRE-TOKEN
-DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_password@db/chat_agent_db
+# OpenAI API Configuration
+OPENAI_API_KEY=sk-proj-your-openai-api-key-here
 
-# Database credentials
+# Logfire Configuration (optional - for observability)
+LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
+
+# Database Configuration
+DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/ai_agent_db
 POSTGRES_USER=chat_user
-POSTGRES_PASSWORD=your_password
-POSTGRES_DB=chat_agent_db
+POSTGRES_PASSWORD=your_secure_password
+POSTGRES_DB=ai_agent_db
 
-# Admin configuration
-ADMIN_USER='admin'
-ADMIN_PASSWORD='your-password'
-FASTAPI_ADMIN_SECRET_KEY='your-secret-key'
+# FastAPI Admin
+ADMIN_USER=admin
+ADMIN_PASSWORD='your_secure_admin_password'
+FASTAPI_ADMIN_SECRET_KEY='your_secret_key_here_32_chars_min'
+
+# Application Configuration
+APP_ENV=development
+DEBUG=false
 ```
 
 - `docker compose -f docker-compose.prod.yml build`
 - `docker compose -f docker-compose.prod.yml up`
 - Set up the pgvector extension:
-  - Run `docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db`
+  - Run `docker exec -it ai_agent_db psql -U chat_user -d ai_agent_db`
   - Run `CREATE EXTENSION IF NOT EXISTS vector;`
   - Close the session typing `\q`.
 - Let's try opening the URL `{domain}/chat`.
@@ -156,7 +166,7 @@ To deploy any changes, just run the script `source deploy-server.sh`
 - Create a conf file: `sudo nano /etc/supervisor/conf.d/ai_agent.conf`
 ```
 [program:ai_agent]
-directory=/home/ubuntu/chat-agent
+directory=/home/ubuntu/AI_agent
 command=sudo /usr/bin/docker compose -f docker-compose.prod.yml up
 autostart=true
 autorestart=true
