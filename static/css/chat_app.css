@@ -97,9 +97,9 @@
             padding: 1rem 2rem;
             position: relative;
             overflow: hidden;
-            border-radius: 0;
-            margin: -1px -1px 0 -1px;
-            border-top: 1px solid transparent;
+            border-radius: 20px 20px 0 0;
+            margin: 0;
+            border-top: none;
         }
 
         .top-nav::before {
