@@ -671,6 +671,28 @@
             border: 1px solid rgba(0, 245, 255, 0.3);
         }
 
+        .message a {
+            color: 00#e6fe;
+            text-decoration: underline;
+            text-decoration-color: #ff34d2;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .message a:hover {
+            color: #ffffff;
+            text-decoration-color: #ffffff;
+            text-shadow: 0 0 8px #ff34d2;
+            background: rgba(255, 52, 210, 0.1);
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+
+        .message a:visited {
+            color: #00e6fe;
+            text-decoration-color: #c778fa;
+        }
+
         .typing-indicator {
             display: none;
             padding: 1rem 2rem;
