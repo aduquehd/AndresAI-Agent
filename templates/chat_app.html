@@ -75,6 +75,7 @@
                         class="message-input"
                         placeholder="Enter your message command..."
                         autocomplete="off"
+                        autofocus
                     />
                     <button class="send-button" type="submit">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -127,6 +128,22 @@
 
         // Make function globally available
         window.copyEmail = copyEmail;
+
+        // Focus input when page loads
+        function focusInput() {
+            const input = document.getElementById('prompt-input');
+            if (input) {
+                // Use setTimeout to ensure DOM is fully loaded
+                setTimeout(() => {
+                    input.focus();
+                }, 100);
+            }
+        }
+
+        // Focus on page load and when returning from background
+        document.addEventListener('DOMContentLoaded', focusInput);
+        window.addEventListener('load', focusInput);
+        window.addEventListener('pageshow', focusInput);
 
         // Load compiled TypeScript module
         import('/chat_app.js').catch((e) => {
