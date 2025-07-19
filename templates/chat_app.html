@@ -8,7 +8,7 @@
     <!-- Open Graph meta tags for social media sharing -->
     <meta property="og:title" content="AndresAI Agent" />
     <meta property="og:description" content="Intelligent AI assistant powered by advanced language models. Chat with AndresAI for help with various tasks." />
-    <meta property="og:image" content="{{ url_for('static', path='/imgs/aduquehd-logo.png') }}" />
+    <meta property="og:image" content="{{ url_for('static', path='/imgs/aduquehd-logo-sm.png') }}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="{{ request.url }}" />
     
@@ -16,7 +16,14 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="AndresAI Agent" />
     <meta name="twitter:description" content="Intelligent AI assistant powered by advanced language models. Chat with AndresAI for help with various tasks." />
-    <meta name="twitter:image" content="{{ url_for('static', path='/imgs/aduquehd-logo.png') }}" />
+    <meta name="twitter:image" content="{{ url_for('static', path='/imgs/aduquehd-logo-sm.png') }}" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', path='/imgs/aduquehd-logo-sm.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', path='/imgs/aduquehd-logo-sm.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', path='/imgs/aduquehd-logo-sm.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', path='/imgs/aduquehd-logo-sm.png') }}">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
