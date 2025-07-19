@@ -26,14 +26,14 @@ npm install
 npm run build  # or npm run watch for development
 
 # Build and start services
-docker compose -f docker-compose.yml build
-docker compose -f docker-compose.yml up
+docker compose build
+docker compose up
 
 # Run database migrations
-docker compose -f docker-compose.yml run --rm backend uv run alembic upgrade head
+docker compose run --rm backend uv run alembic upgrade head
 
 # Create new migration
-docker compose -f docker-compose.yml run --rm backend uv run alembic revision --autogenerate -m "description"
+docker compose run --rm backend uv run alembic revision --autogenerate -m "description"
 
 # Lint and format code
 uv run ruff check .
@@ -76,11 +76,28 @@ The application follows a modular architecture:
 ## Critical Setup Requirements
 
 1. **Environment Variables**: Create `.env` file with:
-   - `OPENAI_API_KEY`
-   - `LOGFIRE_TOKEN`
-   - `DB_CONNECTION_STRING`
-   - `ADMIN_USER`, `ADMIN_PASSWORD`
-   - `FASTAPI_ADMIN_SECRET_KEY`
+   ```dotenv
+   # OpenAI API Configuration
+   OPENAI_API_KEY=sk-proj-your-openai-api-key-here
+   
+   # Logfire Configuration (optional - for observability)
+   LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
+   
+   # Database Configuration
+   DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
+   POSTGRES_USER=chat_user
+   POSTGRES_PASSWORD=your_secure_password
+   POSTGRES_DB=chat_agent_db
+   
+   # FastAPI Admin
+   ADMIN_USER=admin
+   ADMIN_PASSWORD='your_secure_admin_password'
+   FASTAPI_ADMIN_SECRET_KEY='your_secret_key_here_32_chars_min'
+   
+   # Application Configuration
+   APP_ENV=development
+   DEBUG=false
+   ```
 
 2. **pgvector Extension**: Must be manually enabled after first container start:
    ```bash
@@ -98,6 +115,25 @@ The agent's behavior is controlled through the knowledge base API:
 - `POST /api/kb` - Add entries (types: "initial_questions", "faq", "hobbies")
 - `DELETE /api/kb/{id}` - Delete specific entry
 - `DELETE /api/kb/delete-all` - Clear all entries
+
+### Example Knowledge Base Entry:
+
+```json
+{
+    "kbs": [
+        {
+            "type": "hobbies",
+            "title": "Racing bikes",
+            "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
+        },
+        {
+            "type": "hobbies",
+            "title": "Playing guitar",
+            "content": "Started playing guitar last year, it helps me relax after work."
+        }
+    ]
+}
+```
 
 ## Database Schema
 

@@ -46,10 +46,10 @@ OPENAI_API_KEY=sk-proj-your-openai-api-key-here
 LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
 
 # Database Configuration
-DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/ai_agent_db
+DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
 POSTGRES_USER=chat_user
 POSTGRES_PASSWORD=your_secure_password
-POSTGRES_DB=ai_agent_db
+POSTGRES_DB=chat_agent_db
 
 # FastAPI Admin
 ADMIN_USER=admin
@@ -70,12 +70,11 @@ docker compose up
 5. **Set up the pgvector extension**
 In another terminal, run:
 ```bash
-docker exec -it ai_agent_db psql -U chat_user -d ai_agent_db
+docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db
 ```
 Then execute:
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
-\q
 ```
 
 6. **Access the application**
@@ -87,7 +86,7 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 ## Local DB connect.
 
-To connect to the database locally, connect using `jdbc:postgresql://localhost:5432/ai_agent_db` with username `chat_user`.
+To connect to the database locally, connect using `jdbc:postgresql://localhost:5432/chat_agent_db` with username `chat_user`.
 
 ## Running the project properly.
 
@@ -134,10 +133,10 @@ OPENAI_API_KEY=sk-proj-your-openai-api-key-here
 LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
 
 # Database Configuration
-DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/ai_agent_db
+DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
 POSTGRES_USER=chat_user
 POSTGRES_PASSWORD=your_secure_password
-POSTGRES_DB=ai_agent_db
+POSTGRES_DB=chat_agent_db
 
 # FastAPI Admin
 ADMIN_USER=admin
@@ -152,7 +151,7 @@ DEBUG=false
 - `docker compose -f docker-compose.prod.yml build`
 - `docker compose -f docker-compose.prod.yml up`
 - Set up the pgvector extension:
-  - Run `docker exec -it ai_agent_db psql -U chat_user -d ai_agent_db`
+  - Run `docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db`
   - Run `CREATE EXTENSION IF NOT EXISTS vector;`
   - Close the session typing `\q`.
 - Let's try opening the URL `{domain}/chat`.
