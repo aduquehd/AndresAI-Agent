@@ -884,7 +884,7 @@
 
         .new-chat-container {
             margin-top: 0.75rem;
-            justify-content: flex-end;
+            justify-content: center;
             align-items: center;
             display: none;
             opacity: 0;
@@ -1098,6 +1098,10 @@
                 padding: 0.75rem;
             }
 
+            .new-chat-container {
+                justify-content: center;
+            }
+
             .app-title {
                 font-size: 1.5rem;
             }
@@ -1208,6 +1212,10 @@
 
             .input-container {
                 padding: 0.75rem;
+            }
+
+            .new-chat-container {
+                justify-content: center;
             }
 
             .app-title {
