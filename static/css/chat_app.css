@@ -4,6 +4,10 @@
             box-sizing: border-box;
         }
 
+        html {
+            height: -webkit-fill-available;
+        }
+
         :root {
             --primary-bg: #0a0a0f;
             --secondary-bg: #1a1a2e;
@@ -24,6 +28,7 @@
             background: var(--primary-bg);
             color: var(--text-primary);
             height: 100vh;
+            height: -webkit-fill-available;
             overflow: hidden;
             position: relative;
         }
@@ -69,6 +74,7 @@
             display: flex;
             flex-direction: column;
             height: calc(100vh - 4rem);
+            height: calc(100dvh - 4rem);
             max-width: 1200px;
             margin: 2rem auto;
             background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(26, 26, 46, 0.3) 100%);
@@ -542,6 +548,7 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            min-height: 0;
         }
 
         .chat-messages {
@@ -552,6 +559,8 @@
             flex-direction: column;
             gap: 2rem;
             position: relative;
+            -webkit-overflow-scrolling: touch;
+            min-height: 0;
         }
 
         .chat-messages::-webkit-scrollbar {
@@ -703,6 +712,7 @@
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--border-glow);
             position: relative;
+            flex-shrink: 0;
         }
 
         .input-container::before {
@@ -985,6 +995,7 @@
             .app-container {
                 margin: 1rem;
                 height: calc(100vh - 2rem);
+                height: calc(100dvh - 2rem);
                 border-radius: 15px;
             }
 
@@ -1090,6 +1101,7 @@
             .app-container {
                 margin: 0.5rem;
                 height: calc(100vh - 1rem);
+                height: calc(100dvh - 1rem);
                 border-radius: 10px;
             }
 
@@ -1192,5 +1204,33 @@
 
             .app-title {
                 font-size: 1.25rem;
+            }
+        }
+
+        /* iOS Safari/Chrome specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            .app-container {
+                height: calc(100vh - 4rem);
+                height: calc(100dvh - 4rem);
+                min-height: calc(100vh - 4rem);
+                min-height: calc(100dvh - 4rem);
+            }
+
+            @media (max-width: 768px) {
+                .app-container {
+                    height: calc(100vh - 2rem);
+                    height: calc(100dvh - 2rem);
+                    min-height: calc(100vh - 2rem);
+                    min-height: calc(100dvh - 2rem);
+                }
+            }
+
+            @media (max-width: 480px) {
+                .app-container {
+                    height: calc(100vh - 1rem);
+                    height: calc(100dvh - 1rem);
+                    min-height: calc(100vh - 1rem);
+                    min-height: calc(100dvh - 1rem);
+                }
             }
         }
