@@ -672,9 +672,9 @@
         }
 
         .message a {
-            color: 00#e6fe;
+            color: #00e6fe;
             text-decoration: underline;
-            text-decoration-color: #ff34d2;
+            text-decoration-color: #00e6fe;
             font-weight: 500;
             transition: all 0.3s ease;
         }
