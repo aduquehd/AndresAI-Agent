@@ -59,6 +59,9 @@ FASTAPI_ADMIN_SECRET_KEY='your_secret_key_here_32_chars_min'
 # Application Configuration
 APP_ENV=development
 DEBUG=false
+
+# Analytics Configuration (optional)
+GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
 ```
 
 4. **Build and start the services**
@@ -163,6 +166,9 @@ FASTAPI_ADMIN_SECRET_KEY='your_secret_key_here_32_chars_min'
 # Application Configuration
 APP_ENV=development
 DEBUG=false
+
+# Analytics Configuration (optional)
+GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
 ```
 
 - `docker compose -f docker-compose.prod.yml build`

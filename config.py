@@ -13,5 +13,8 @@ class Settings(BaseSettings):
     app_env: str = "development"
     debug: bool = False
 
+    # Analytics
+    ga_tracking_id: str | None = None
+
 
 settings = Settings()

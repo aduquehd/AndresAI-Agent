@@ -107,6 +107,9 @@ The application follows a modular architecture:
    # Application Configuration
    APP_ENV=development
    DEBUG=false
+   
+   # Analytics Configuration (optional)
+   GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
    ```
 
 2. **pgvector Extension**: Must be manually enabled after first container start:

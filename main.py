@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from sqladmin import Admin
 from sqlmodel import SQLModel
 
+from config import settings
 from modules.admin.agent import AgentContextAdmin
 from modules.admin.auth import authentication_backend
 from modules.admin.knowledge_base import KnowledgeBaseAdmin
@@ -57,9 +58,18 @@ logfire.instrument_fastapi(app)
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: HTTPException):
-    return templates.TemplateResponse(request=request, name="404.html", status_code=404)
+    return templates.TemplateResponse(
+        request=request, 
+        name="404.html", 
+        status_code=404,
+        context={"settings": settings}
+    )
 
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse(request=request, name="chat_app.html")
+    return templates.TemplateResponse(
+        request=request, 
+        name="chat_app.html",
+        context={"settings": settings}
+    )

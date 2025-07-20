@@ -2,6 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
+
+    {% if settings.ga_tracking_id %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.ga_tracking_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ settings.ga_tracking_id }}');
+    </script>
+    {% endif %}
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
     <title>AndresAI Agent</title>
     
