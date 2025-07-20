@@ -40,6 +40,11 @@ class Message(SQLModel, table=True):
     )
     user_id: int = Field(default=None, foreign_key="users.id")
     ip_address: str | None = Field(default=None, max_length=45)  # IPv6 can be up to 45 chars
+    user_agent: str | None = Field(default=None, max_length=500)  # Browser/device info
+    response_time_ms: int | None = Field(default=None)  # Response time in milliseconds
+    country: str | None = Field(default=None, max_length=2)  # ISO country code
+    region: str | None = Field(default=None, max_length=100)  # State/region
+    city: str | None = Field(default=None, max_length=100)  # City name
 
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),

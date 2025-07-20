@@ -19,14 +19,24 @@ class MessagesAdmin(ModelView, model=Message):
         "user.id",
         Message.direction,
         Message.ip_address,
+        Message.country,
+        Message.city,
+        Message.response_time_ms,
         Message.created_at,
         "message",
+        "user_agent",
     ]
 
     column_formatters = {
         "message": lambda m, _: (m.message[:60] + "…")
         if m.message and len(m.message) > 60
-        else m.message
+        else m.message,
+        "user_agent": lambda m, _: (m.user_agent[:50] + "…")
+        if m.user_agent and len(m.user_agent) > 50
+        else m.user_agent,
+        "response_time_ms": lambda m, _: f"{m.response_time_ms}ms"
+        if m.response_time_ms
+        else None,
     }
 
 

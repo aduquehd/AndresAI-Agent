@@ -1,8 +1,10 @@
 import json
+import time
 from datetime import datetime, timezone
 from typing import Annotated
 
 import logfire
+import requests
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import Response, StreamingResponse
 from openai import AsyncOpenAI
@@ -48,6 +50,32 @@ def get_client_ip(request: Request) -> str:
     return "unknown"
 
 
+def get_user_agent(request: Request) -> str:
+    """Extract user agent string from request headers."""
+    return request.headers.get("User-Agent", "unknown")
+
+
+def get_geographic_data(ip_address: str) -> dict:
+    """Get geographic information from IP address using ipapi.co (free tier)."""
+    if ip_address in ["unknown", "127.0.0.1", "::1"] or ip_address.startswith("192.168.") or ip_address.startswith("10."):
+        return {"country": None, "region": None, "city": None}
+    
+    try:
+        # Use ipapi.co free service (1000 requests/month, no API key needed)
+        response = requests.get(f"https://ipapi.co/{ip_address}/json/", timeout=3)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                "country": data.get("country_code"),
+                "region": data.get("region"),
+                "city": data.get("city")
+            }
+    except Exception as e:
+        logfire.warn("Failed to get geographic data", ip=ip_address, error=str(e))
+    
+    return {"country": None, "region": None, "city": None}
+
+
 @router.get("/history")
 async def get_chat(
     user_id: Annotated[str, Depends(get_user_id_from_auth_header)],
@@ -87,7 +115,12 @@ async def post_chat(
 ) -> StreamingResponse:
     user = await get_user_by_username(session, user_id)
     now = datetime.now(timezone.utc)
+    start_time = time.time()
+    
+    # Capture request metadata
     client_ip = get_client_ip(request)
+    user_agent = get_user_agent(request)
+    geo_data = get_geographic_data(client_ip)
 
     if not user:
         user = User(username=user_id)
@@ -137,21 +170,37 @@ async def post_chat(
         )
         await add_agent_message(session, agent_message)
 
+        # Calculate response time
+        end_time = time.time()
+        response_time_ms = int((end_time - start_time) * 1000)
+
+        # Save user message (outgoing)
         new_message = Message(
             message=prompt,
             user_id=user.id,
             created_at=now,
             direction=MessageDirectionEnum.outgoing,
             ip_address=client_ip,
+            user_agent=user_agent,
+            response_time_ms=None,  # No response time for user messages
+            country=geo_data["country"],
+            region=geo_data["region"],
+            city=geo_data["city"],
         )
         await add_message(session, new_message)
 
+        # Save agent response (incoming)
         new_message = Message(
             message=agent_response["content"],
             user_id=user.id,
             created_at=now,
             direction=MessageDirectionEnum.incoming,
             ip_address=client_ip,
+            user_agent=user_agent,
+            response_time_ms=response_time_ms,
+            country=geo_data["country"],
+            region=geo_data["region"],
+            city=geo_data["city"],
         )
         await add_message(session, new_message)
 
