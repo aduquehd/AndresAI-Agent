@@ -40,9 +40,19 @@ uv run ruff check .
 uv run ruff format .
 
 # Access services
-# Chat UI: http://localhost:8000/chat
+# Chat UI: http://localhost:8000/
 # Admin panel: http://localhost:8000/admin
 ```
+
+### Code Quality Standards
+
+**IMPORTANT**: Always run code formatting after making changes:
+
+```bash
+uv run ruff format .
+```
+
+This ensures consistent code style across the project. The formatting should be run before committing any Python code changes.
 
 ### Production Deployment
 

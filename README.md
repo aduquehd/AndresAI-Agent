@@ -78,10 +78,27 @@ CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
 6. **Access the application**
-- Chat UI: http://localhost:8000/chat
+- Chat UI: http://localhost:8000/
 - Admin panel: http://localhost:8000/admin
 
 ## Development
+
+### Code Formatting
+
+This project uses [Ruff](https://docs.astral.sh/ruff/) for code formatting and linting. Always format your code before committing:
+
+```bash
+# Format all Python files
+uv run ruff format .
+
+# Check for linting issues
+uv run ruff check .
+
+# Fix auto-fixable linting issues
+uv run ruff check . --fix
+```
+
+**Important**: Always run `uv run ruff format .` after making any code changes to maintain consistent code style.
 
 
 ## Local DB connect.
@@ -90,7 +107,7 @@ To connect to the database locally, connect using `jdbc:postgresql://localhost:5
 
 ## Running the project properly.
 
-The agent can be used through the web UI at `http://localhost:8000/chat`. Each visitor is automatically assigned a unique UUID stored in localStorage, keeping conversations separate and persistent across sessions.
+The agent can be used through the web UI at `http://localhost:8000/`. Each visitor is automatically assigned a unique UUID stored in localStorage, keeping conversations separate and persistent across sessions.
 
 ## Configuring the Agent
 
@@ -154,7 +171,7 @@ DEBUG=false
   - Run `docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db`
   - Run `CREATE EXTENSION IF NOT EXISTS vector;`
   - Close the session typing `\q`.
-- Let's try opening the URL `{domain}/chat`.
+- Let's try opening the URL `{domain}/`.
 
 ## Re-deployment
 To deploy any changes, just run the script `source deploy-server.sh`
