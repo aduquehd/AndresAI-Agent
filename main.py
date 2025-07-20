@@ -64,11 +64,6 @@ async def not_found_handler(request: Request, exc: HTTPException):
     )
 
 
-@app.get("/chat_app.js")
-async def main_js() -> FileResponse:
-    return FileResponse((THIS_DIR / "static" / "js" / "chat_app.js"), media_type="application/javascript")
-
-
 @app.get("/chat", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(request=request, name="chat_app.html")

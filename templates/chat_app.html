@@ -27,7 +27,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/chat_app.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/chat-app.css') }}">
 </head>
 <body>
     <div class="app-container">
@@ -122,55 +122,7 @@
         </main>
     </div>
 
-    <script src="{{ url_for('static', path='/typescript.min.js') }}"
-            crossorigin="anonymous"
-            referrerpolicy="no-referrer"></script>
-
-    <script type="module">
-        // Copy email function
-        function copyEmail() {
-            const email = 'aduquehd@gmail.com';
-            navigator.clipboard.writeText(email).then(() => {
-                // Create and show feedback
-                const feedback = document.createElement('div');
-                feedback.className = 'copy-feedback';
-                feedback.textContent = 'Email Copied!';
-                document.body.appendChild(feedback);
-
-                // Remove feedback after animation
-                setTimeout(() => {
-                    document.body.removeChild(feedback);
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy email: ', err);
-            });
-        }
-
-        // Make function globally available
-        window.copyEmail = copyEmail;
-
-        // Focus input when page loads
-        function focusInput() {
-            const input = document.getElementById('prompt-input');
-            if (input) {
-                // Use setTimeout to ensure DOM is fully loaded
-                setTimeout(() => {
-                    input.focus();
-                }, 100);
-            }
-        }
-
-        // Focus on page load and when returning from background
-        document.addEventListener('DOMContentLoaded', focusInput);
-        window.addEventListener('load', focusInput);
-        window.addEventListener('pageshow', focusInput);
-
-        // Load compiled TypeScript module
-        import('/chat_app.js').catch((e) => {
-            console.error(e);
-            document.getElementById('error').classList.add('show');
-            document.getElementById('spinner').classList.remove('active');
-        });
-    </script>
+    <script type="module" src="{{ url_for('static', path='/js/chat-app.js') }}"></script>
+    <script type="module" src="{{ url_for('static', path='/dist/utils.js') }}"></script>
 </body>
 </html>
