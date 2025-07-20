@@ -33,7 +33,7 @@ body {
   position: relative;
 }
 
-/* Animated background grid */
+/* Futuristic matrix-style background */
 body::before {
   content: "";
   position: fixed;
@@ -41,16 +41,27 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image:
-    linear-gradient(rgba(0, 245, 255, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px);
-  background-size: 50px 50px;
-  animation: gridMove 20s linear infinite;
+  background-image: 
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 245, 255, 0.03) 2px,
+      rgba(0, 245, 255, 0.03) 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 0, 128, 0.03) 2px,
+      rgba(255, 0, 128, 0.03) 4px
+    );
+  animation: matrixScroll 30s linear infinite;
   pointer-events: none;
   z-index: 0;
 }
 
-/* Floating particles */
+/* Additional tech overlay effect */
 body::after {
   content: "";
   position: fixed;
@@ -58,17 +69,33 @@ body::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background:
-    radial-gradient(2px 2px at 20px 30px, var(--accent-primary), transparent),
-    radial-gradient(2px 2px at 40px 70px, var(--accent-secondary), transparent),
-    radial-gradient(1px 1px at 90px 40px, var(--accent-tertiary), transparent),
-    radial-gradient(1px 1px at 130px 80px, var(--accent-primary), transparent),
-    radial-gradient(2px 2px at 160px 30px, var(--accent-secondary), transparent);
-  background-repeat: repeat;
-  background-size: 200px 100px;
-  animation: particlesFloat 15s ease-in-out infinite;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(124, 58, 237, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.6;
+  animation: pulseGlow 8s ease-in-out infinite alternate;
+}
+
+
+/* Circuit board pattern overlay */
+.app-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    linear-gradient(0deg, transparent 24%, rgba(0, 245, 255, 0.03) 25%, rgba(0, 245, 255, 0.03) 26%, transparent 27%, transparent 74%, rgba(0, 245, 255, 0.03) 75%, rgba(0, 245, 255, 0.03) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(255, 0, 128, 0.03) 25%, rgba(255, 0, 128, 0.03) 26%, transparent 27%, transparent 74%, rgba(255, 0, 128, 0.03) 75%, rgba(255, 0, 128, 0.03) 76%, transparent 77%, transparent);
+  background-size: 60px 60px;
   pointer-events: none;
   z-index: 1;
+  animation: circuitFlow 30s linear infinite;
+  border-radius: 20px;
 }
 
 .app-container {
@@ -80,15 +107,16 @@ body::after {
   margin: 2rem auto;
   margin-top: max(2rem, env(safe-area-inset-top) + 1rem);
   margin-bottom: max(2rem, env(safe-area-inset-bottom) + 1rem);
-  background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(26, 26, 46, 0.3) 100%);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
+  background: linear-gradient(135deg, rgba(10, 10, 15, 0.9) 0%, rgba(26, 26, 46, 0.8) 50%, rgba(10, 10, 15, 0.9) 100%);
+  backdrop-filter: blur(25px);
+  border: 1px solid rgba(0, 245, 255, 0.2);
   border-radius: 20px;
   position: relative;
   z-index: 2;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 0 50px rgba(0, 245, 255, 0.1);
+    0 0 60px rgba(0, 245, 255, 0.15),
+    0 0 120px rgba(255, 0, 128, 0.1);
 }
 
 .top-nav {
@@ -1096,12 +1124,36 @@ body::after {
 }
 
 /* Animations */
-@keyframes gridMove {
+@keyframes matrixScroll {
   0% {
-    transform: translate(0, 0);
+    transform: translateY(0);
   }
   100% {
-    transform: translate(50px, 50px);
+    transform: translateY(100px);
+  }
+}
+
+@keyframes pulseGlow {
+  0% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+}
+
+@keyframes circuitFlow {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 60px 60px, -60px 60px;
   }
 }
 
