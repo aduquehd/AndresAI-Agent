@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     fastapi_admin_secret_key: str
     admin_user: str
     admin_password: str
-    
+
     # Application
     app_env: str = "development"
     debug: bool = False

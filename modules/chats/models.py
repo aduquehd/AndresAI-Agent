@@ -53,5 +53,3 @@ class Message(SQLModel, table=True):
 
     # Relationship back to user
     user: User = Relationship(back_populates="messages")
-
-

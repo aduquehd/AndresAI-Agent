@@ -34,9 +34,5 @@ class MessagesAdmin(ModelView, model=Message):
         "user_agent": lambda m, _: (m.user_agent[:50] + "…")
         if m.user_agent and len(m.user_agent) > 50
         else m.user_agent,
-        "response_time_ms": lambda m, _: f"{m.response_time_ms}ms"
-        if m.response_time_ms
-        else None,
+        "response_time_ms": lambda m, _: f"{m.response_time_ms}ms" if m.response_time_ms else None,
     }
-
-

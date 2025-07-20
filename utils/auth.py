@@ -33,16 +33,16 @@ def get_current_username(
 def get_user_id_from_auth_header(request: Request) -> str:
     """
     Extract user ID from Authorization header with format 'User-Id {uuid}'.
-    
+
     This is a FastAPI dependency that can be used to authenticate users
     based on their client-generated UUID sent in the Authorization header.
-    
+
     Args:
         request: FastAPI Request object containing headers
-        
+
     Returns:
         str: The user ID extracted from the Authorization header
-        
+
     Raises:
         HTTPException: If Authorization header is missing, malformed, or empty
     """
@@ -51,22 +51,22 @@ def get_user_id_from_auth_header(request: Request) -> str:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authorization header is required",
-            headers={"WWW-Authenticate": "User-Id"}
+            headers={"WWW-Authenticate": "User-Id"},
         )
-    
+
     if not auth_header.startswith("User-Id "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authorization header must start with 'User-Id '",
-            headers={"WWW-Authenticate": "User-Id"}
+            headers={"WWW-Authenticate": "User-Id"},
         )
-    
+
     user_id = auth_header.replace("User-Id ", "").strip()
     if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User ID is required in Authorization header",
-            headers={"WWW-Authenticate": "User-Id"}
+            headers={"WWW-Authenticate": "User-Id"},
         )
-    
+
     return user_id

@@ -37,16 +37,16 @@ def get_client_ip(request: Request) -> str:
     if forwarded_for:
         # X-Forwarded-For can contain multiple IPs, take the first one (original client)
         return forwarded_for.split(",")[0].strip()
-    
+
     # Check X-Real-IP header (nginx proxy)
     real_ip = request.headers.get("X-Real-IP")
     if real_ip:
         return real_ip.strip()
-    
+
     # Fall back to client.host (direct connection)
     if request.client:
         return request.client.host
-    
+
     return "unknown"
 
 
@@ -57,9 +57,13 @@ def get_user_agent(request: Request) -> str:
 
 def get_geographic_data(ip_address: str) -> dict:
     """Get geographic information from IP address using ipapi.co (free tier)."""
-    if ip_address in ["unknown", "127.0.0.1", "::1"] or ip_address.startswith("192.168.") or ip_address.startswith("10."):
+    if (
+        ip_address in ["unknown", "127.0.0.1", "::1"]
+        or ip_address.startswith("192.168.")
+        or ip_address.startswith("10.")
+    ):
         return {"country": None, "region": None, "city": None}
-    
+
     try:
         # Use ipapi.co free service (1000 requests/month, no API key needed)
         response = requests.get(f"https://ipapi.co/{ip_address}/json/", timeout=3)
@@ -68,11 +72,11 @@ def get_geographic_data(ip_address: str) -> dict:
             return {
                 "country": data.get("country_code"),
                 "region": data.get("region"),
-                "city": data.get("city")
+                "city": data.get("city"),
             }
     except Exception as e:
         logfire.warn("Failed to get geographic data", ip=ip_address, error=str(e))
-    
+
     return {"country": None, "region": None, "city": None}
 
 
@@ -116,7 +120,7 @@ async def post_chat(
     user = await get_user_by_username(session, user_id)
     now = datetime.now(timezone.utc)
     start_time = time.time()
-    
+
     # Capture request metadata
     client_ip = get_client_ip(request)
     user_agent = get_user_agent(request)
@@ -182,7 +186,7 @@ async def post_chat(
             direction=MessageDirectionEnum.outgoing,
             ip_address=client_ip,
             user_agent=user_agent,
-            response_time_ms=None,  # No response time for user messages
+            response_time_ms=response_time_ms,
             country=geo_data["country"],
             region=geo_data["region"],
             city=geo_data["city"],

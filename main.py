@@ -57,13 +57,9 @@ logfire.instrument_fastapi(app)
 
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: HTTPException):
-    return templates.TemplateResponse(
-        request=request, 
-        name="404.html", 
-        status_code=404
-    )
+    return templates.TemplateResponse(request=request, name="404.html", status_code=404)
 
 
-@app.get("/chat", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(request=request, name="chat_app.html")

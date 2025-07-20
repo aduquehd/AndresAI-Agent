@@ -33,9 +33,7 @@ async def _get_query_embedding(openai_client: Any, query: str) -> list[float]:
         model="text-embedding-3-small",
     )
     if len(embedding.data) != 1:
-        raise ValueError(
-            f"Expected 1 embedding, got {len(embedding.data)}, query: {query!r}"
-        )
+        raise ValueError(f"Expected 1 embedding, got {len(embedding.data)}, query: {query!r}")
     return embedding.data[0].embedding
 
 

@@ -18,7 +18,6 @@ async def add_agent_message(session: AsyncSession, agent_message: AgentMessage) 
     return agent_message
 
 
-
 async def get_agent_messages(
     session: AsyncSession,
     user_id: int,
