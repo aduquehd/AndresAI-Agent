@@ -1182,7 +1182,7 @@ body::after {
   }
 
   .app-title {
-    font-size: 1.5rem;
+    display: none;
   }
 }
 
@@ -1297,7 +1297,7 @@ body::after {
   }
 
   .app-title {
-    font-size: 1.25rem;
+    display: none;
   }
 }
 
