@@ -48,11 +48,27 @@ uv run ruff format .
 
 **IMPORTANT**: Always run code formatting after making changes:
 
+#### Python Code
+
 ```bash
 uv run ruff format .
 ```
 
-This ensures consistent code style across the project. The formatting should be run before committing any Python code changes.
+#### Frontend Code (HTML, CSS, JS)
+
+```bash
+npm run format
+```
+
+**Complete formatting workflow:**
+
+```bash
+# Format all code types
+uv run ruff format .
+npm run format
+```
+
+This ensures consistent code style across the entire project. Both formatters should be run before committing any code changes.
 
 ### Production Deployment
 
@@ -86,28 +102,29 @@ The application follows a modular architecture:
 ## Critical Setup Requirements
 
 1. **Environment Variables**: Create `.env` file with:
+
    ```dotenv
    # OpenAI API Configuration
    OPENAI_API_KEY=sk-proj-your-openai-api-key-here
-   
+
    # Logfire Configuration (optional - for observability)
    LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
-   
+
    # Database Configuration
    DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
    POSTGRES_USER=chat_user
    POSTGRES_PASSWORD=your_secure_password
    POSTGRES_DB=chat_agent_db
-   
+
    # FastAPI Admin
    ADMIN_USER=admin
    ADMIN_PASSWORD='your_secure_admin_password'
    FASTAPI_ADMIN_SECRET_KEY='your_secret_key_here_32_chars_min'
-   
+
    # Application Configuration
    APP_ENV=development
    DEBUG=false
-   
+
    # Analytics Configuration (optional)
    GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
    ```
@@ -118,7 +135,6 @@ The application follows a modular architecture:
    CREATE EXTENSION IF NOT EXISTS vector;
    \q
    ```
-
 
 ## Knowledge Base API
 
@@ -133,24 +149,25 @@ The agent's behavior is controlled through the knowledge base API:
 
 ```json
 {
-    "kbs": [
-        {
-            "type": "hobbies",
-            "title": "Racing bikes",
-            "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
-        },
-        {
-            "type": "hobbies",
-            "title": "Playing guitar",
-            "content": "Started playing guitar last year, it helps me relax after work."
-        }
-    ]
+  "kbs": [
+    {
+      "type": "hobbies",
+      "title": "Racing bikes",
+      "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
+    },
+    {
+      "type": "hobbies",
+      "title": "Playing guitar",
+      "content": "Started playing guitar last year, it helps me relax after work."
+    }
+  ]
 }
 ```
 
 ## Database Schema
 
 Key models in `modules/*/models.py`:
+
 - **User**: User accounts
 - **Agent**: AI agent configurations
 - **Chat**: Conversation sessions

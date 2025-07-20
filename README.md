@@ -20,24 +20,28 @@ A production-ready AI chatbot system built with FastAPI that supports web interf
 ## Quick Start
 
 1. **Clone the repository**
+
 ```bash
 git clone <repository-url>
 cd AI_agent
 ```
 
 2. **Install dependencies**
+
 ```bash
 npm install
 npm run build
 ```
 
 3. **Create environment file**
-Copy `.env.example` to `.env` and fill in your values:
+   Copy `.env.example` to `.env` and fill in your values:
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` with your configuration:
+
 ```dotenv
 # OpenAI API Configuration
 OPENAI_API_KEY=sk-proj-your-openai-api-key-here
@@ -65,22 +69,27 @@ GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
 ```
 
 4. **Build and start the services**
+
 ```bash
 docker compose build
 docker compose up
 ```
 
 5. **Set up the pgvector extension**
-In another terminal, run:
+   In another terminal, run:
+
 ```bash
 docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db
 ```
+
 Then execute:
+
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
 6. **Access the application**
+
 - Chat UI: http://localhost:8000/
 - Admin panel: http://localhost:8000/admin
 
@@ -88,7 +97,9 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 ### Code Formatting
 
-This project uses [Ruff](https://docs.astral.sh/ruff/) for code formatting and linting. Always format your code before committing:
+This project uses multiple formatters for different file types:
+
+#### Python Code (Ruff)
 
 ```bash
 # Format all Python files
@@ -101,8 +112,25 @@ uv run ruff check .
 uv run ruff check . --fix
 ```
 
-**Important**: Always run `uv run ruff format .` after making any code changes to maintain consistent code style.
+#### Frontend Code (Prettier)
 
+```bash
+# Format all supported files (HTML, CSS, JS)
+npm run format
+
+# Check formatting without making changes
+npm run format:check
+
+# Format specific file types
+npm run format:html  # HTML templates
+npm run format:css   # CSS files
+npm run format:js    # JavaScript files
+```
+
+**Important**: Always run both formatters after making code changes:
+
+- `uv run ruff format .` for Python files
+- `npm run format` for HTML, CSS, and JavaScript files
 
 ## Local DB connect.
 
@@ -120,21 +148,20 @@ The knowledge base is what the Agent uses to get the context of what to do.
 
 ```json
 {
-    "kbs": [
-        {
-            "type": "hobbies",
-            "title": "Racing bikes",
-            "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
-        },
-        {
-            "type": "hobbies",
-            "title": "Playing guitar",
-            "content": "Started playing guitar last year, it helps me relax after work."
-        }
-    ]
+  "kbs": [
+    {
+      "type": "hobbies",
+      "title": "Racing bikes",
+      "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
+    },
+    {
+      "type": "hobbies",
+      "title": "Playing guitar",
+      "content": "Started playing guitar last year, it helps me relax after work."
+    }
+  ]
 }
 ```
-
 
 # Deployment
 
@@ -145,6 +172,7 @@ PD: You may need to use `sudo` in all docker commands, like `sudo docker compose
 - Install Docker in the machine.
 - Create a `.env` file:
 - Make sure the domain at `compose/prod/Caddyfile` is correct.
+
 ```dotenv
 # OpenAI API Configuration
 OPENAI_API_KEY=sk-proj-your-openai-api-key-here
@@ -180,12 +208,14 @@ GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
 - Let's try opening the URL `{domain}/`.
 
 ## Re-deployment
+
 To deploy any changes, just run the script `source deploy-server.sh`
 
 ## Optionally setup Supervisor to run the project.
 
 - `sudo apt install supervisor -y`
 - Create a conf file: `sudo nano /etc/supervisor/conf.d/ai_agent.conf`
+
 ```
 [program:ai_agent]
 directory=/home/ubuntu/AI_agent
@@ -195,6 +225,7 @@ autorestart=true
 stderr_logfile=/var/log/ai_agent.err.log
 stdout_logfile=/var/log/ai_agent.out.log
 ```
+
 - `sudo supervisorctl reread`
 - `sudo supervisorctl update`
 - `sudo supervisorctl start ai_agent`
@@ -202,5 +233,6 @@ stdout_logfile=/var/log/ai_agent.out.log
 
 If you would like to see better logs for debugging, stop ai_agent
 and run docker compose manually.
+
 - `sudo supervisorctl stop ai_agent`
 - `docker compose -f docker-compose.prod.yml up`

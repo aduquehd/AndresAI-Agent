@@ -1,388 +1,454 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>404 - AndresAI Not Found</title>
-    
+
     {% if settings.ga_tracking_id %}
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ settings.ga_tracking_id }}"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
 
-      gtag('config', '{{ settings.ga_tracking_id }}');
+      gtag("config", "{{ settings.ga_tracking_id }}");
     </script>
     {% endif %}
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        :root {
-            --primary-bg: #0a0a0f;
-            --secondary-bg: #1a1a2e;
-            --accent-primary: #00f5ff;
-            --accent-secondary: #ff0080;
-            --accent-tertiary: #7c3aed;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --text-muted: #606060;
-            --border-glow: rgba(0, 245, 255, 0.3);
-            --grid-color: rgba(0, 245, 255, 0.1);
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
+      :root {
+        --primary-bg: #0a0a0f;
+        --secondary-bg: #1a1a2e;
+        --accent-primary: #00f5ff;
+        --accent-secondary: #ff0080;
+        --accent-tertiary: #7c3aed;
+        --text-primary: #ffffff;
+        --text-secondary: #a0a0a0;
+        --text-muted: #606060;
+        --border-glow: rgba(0, 245, 255, 0.3);
+        --grid-color: rgba(0, 245, 255, 0.1);
+        --glass-bg: rgba(255, 255, 255, 0.05);
+        --glass-border: rgba(255, 255, 255, 0.1);
+      }
 
-        body {
-            font-family: 'Exo 2', sans-serif;
-            background: var(--primary-bg);
-            color: var(--text-primary);
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      body {
+        font-family: "Exo 2", sans-serif;
+        background: var(--primary-bg);
+        color: var(--text-primary);
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        /* Animated background grid */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image:
-                linear-gradient(rgba(0, 245, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: gridMove 20s linear infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
+      /* Animated background grid */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          linear-gradient(rgba(0, 245, 255, 0.1) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 245, 255, 0.1) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: gridMove 20s linear infinite;
+        pointer-events: none;
+        z-index: 0;
+      }
 
-        /* Floating particles */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(2px 2px at 20px 30px, var(--accent-primary), transparent),
-                        radial-gradient(2px 2px at 40px 70px, var(--accent-secondary), transparent),
-                        radial-gradient(1px 1px at 90px 40px, var(--accent-tertiary), transparent),
-                        radial-gradient(1px 1px at 130px 80px, var(--accent-primary), transparent),
-                        radial-gradient(2px 2px at 160px 30px, var(--accent-secondary), transparent);
-            background-repeat: repeat;
-            background-size: 200px 100px;
-            animation: particlesFloat 15s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 1;
-        }
+      /* Floating particles */
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background:
+          radial-gradient(2px 2px at 20px 30px, var(--accent-primary), transparent),
+          radial-gradient(2px 2px at 40px 70px, var(--accent-secondary), transparent),
+          radial-gradient(1px 1px at 90px 40px, var(--accent-tertiary), transparent),
+          radial-gradient(1px 1px at 130px 80px, var(--accent-primary), transparent),
+          radial-gradient(2px 2px at 160px 30px, var(--accent-secondary), transparent);
+        background-repeat: repeat;
+        background-size: 200px 100px;
+        animation: particlesFloat 15s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+      }
 
+      .container {
+        text-align: center;
+        z-index: 2;
+        position: relative;
+        background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(26, 26, 46, 0.3) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 4rem 3rem;
+        box-shadow:
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          0 0 50px rgba(0, 245, 255, 0.1);
+        max-width: 600px;
+        width: 90%;
+      }
+
+      .error-code {
+        font-family: "Orbitron", monospace;
+        font-size: 8rem;
+        font-weight: 900;
+        color: var(--accent-primary);
+        text-shadow:
+          0 0 20px var(--accent-primary),
+          0 0 40px var(--accent-primary),
+          0 0 60px var(--accent-primary);
+        margin-bottom: 1rem;
+        position: relative;
+        animation: glitch 3s infinite;
+      }
+
+      .error-code::before {
+        content: "404";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 0, 128, 0.1), transparent);
+        animation: scanLine 2s ease-in-out infinite;
+        z-index: -1;
+      }
+
+      .error-title {
+        font-family: "Orbitron", monospace;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        text-shadow: 0 0 10px var(--accent-secondary);
+      }
+
+      .error-message {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+      }
+
+      .error-description {
+        font-size: 1rem;
+        color: var(--text-muted);
+        margin-bottom: 3rem;
+        line-height: 1.5;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+        border: none;
+        border-radius: 25px;
+        padding: 1rem 2rem;
+        font-family: "Orbitron", monospace;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: white;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow:
+          0 0 20px rgba(0, 245, 255, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .btn:hover {
+        transform: scale(1.05) translateY(-2px);
+        box-shadow:
+          0 0 30px rgba(0, 245, 255, 0.6),
+          0 10px 30px rgba(0, 0, 0, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+
+      .btn:active {
+        transform: scale(0.95);
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, var(--accent-tertiary) 0%, var(--accent-secondary) 100%);
+        box-shadow:
+          0 0 20px rgba(124, 58, 237, 0.4),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-secondary:hover {
+        box-shadow:
+          0 0 30px rgba(124, 58, 237, 0.6),
+          0 10px 30px rgba(0, 0, 0, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+
+      .neural-circuit {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border: 2px solid var(--accent-primary);
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: pulse 2s infinite;
+      }
+
+      .neural-circuit::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 30px;
+        height: 30px;
+        border: 2px solid var(--accent-secondary);
+        border-radius: 50%;
+        animation: pulse 2s infinite 0.5s;
+      }
+
+      .neural-circuit::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 10px;
+        height: 10px;
+        background: var(--accent-primary);
+        border-radius: 50%;
+        animation: pulse 2s infinite 1s;
+      }
+
+      /* Animations */
+      @keyframes gridMove {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(50px, 50px);
+        }
+      }
+
+      @keyframes particlesFloat {
+        0%,
+        100% {
+          transform: translateY(0) rotate(0deg);
+        }
+        33% {
+          transform: translateY(-20px) rotate(120deg);
+        }
+        66% {
+          transform: translateY(20px) rotate(240deg);
+        }
+      }
+
+      @keyframes scanLine {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      @keyframes glitch {
+        0%,
+        100% {
+          transform: translate(0);
+        }
+        10% {
+          transform: translate(-2px, 2px);
+        }
+        20% {
+          transform: translate(2px, -2px);
+        }
+        30% {
+          transform: translate(-2px, -2px);
+        }
+        40% {
+          transform: translate(2px, 2px);
+        }
+        50% {
+          transform: translate(-2px, 2px);
+        }
+        60% {
+          transform: translate(2px, -2px);
+        }
+        70% {
+          transform: translate(-2px, -2px);
+        }
+        80% {
+          transform: translate(2px, 2px);
+        }
+        90% {
+          transform: translate(-2px, 2px);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow:
+            0 0 10px var(--accent-primary),
+            0 0 20px var(--accent-primary);
+        }
+        50% {
+          box-shadow:
+            0 0 20px var(--accent-primary),
+            0 0 40px var(--accent-primary);
+        }
+        100% {
+          box-shadow:
+            0 0 10px var(--accent-primary),
+            0 0 20px var(--accent-primary);
+        }
+      }
+
+      /* Responsive design */
+      @media (max-width: 768px) {
         .container {
-            text-align: center;
-            z-index: 2;
-            position: relative;
-            background: linear-gradient(135deg, var(--glass-bg) 0%, rgba(26, 26, 46, 0.3) 100%);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 4rem 3rem;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, 0.1),
-                0 0 50px rgba(0, 245, 255, 0.1);
-            max-width: 600px;
-            width: 90%;
+          padding: 3rem 2rem;
         }
 
         .error-code {
-            font-family: 'Orbitron', monospace;
-            font-size: 8rem;
-            font-weight: 900;
-            color: var(--accent-primary);
-            text-shadow:
-                0 0 20px var(--accent-primary),
-                0 0 40px var(--accent-primary),
-                0 0 60px var(--accent-primary);
-            margin-bottom: 1rem;
-            position: relative;
-            animation: glitch 3s infinite;
-        }
-
-        .error-code::before {
-            content: '404';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 0, 128, 0.1), transparent);
-            animation: scanLine 2s ease-in-out infinite;
-            z-index: -1;
+          font-size: 6rem;
         }
 
         .error-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            text-shadow: 0 0 10px var(--accent-secondary);
+          font-size: 2rem;
         }
 
         .error-message {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .error-description {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-bottom: 3rem;
-            line-height: 1.5;
+          font-size: 1.1rem;
         }
 
         .action-buttons {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
+          flex-direction: column;
+          align-items: center;
         }
 
         .btn {
-            background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 1rem 2rem;
-            font-family: 'Orbitron', monospace;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: white;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow:
-                0 0 20px rgba(0, 245, 255, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+          width: 100%;
+          max-width: 300px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 2rem 1.5rem;
         }
 
-        .btn:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow:
-                0 0 30px rgba(0, 245, 255, 0.6),
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        .error-code {
+          font-size: 4rem;
         }
 
-        .btn:active {
-            transform: scale(0.95);
+        .error-title {
+          font-size: 1.5rem;
         }
 
-        .btn-secondary {
-            background: linear-gradient(135deg, var(--accent-tertiary) 0%, var(--accent-secondary) 100%);
-            box-shadow:
-                0 0 20px rgba(124, 58, 237, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            box-shadow:
-                0 0 30px rgba(124, 58, 237, 0.6),
-                0 10px 30px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        .error-message {
+          font-size: 1rem;
         }
 
         .neural-circuit {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border: 2px solid var(--accent-primary);
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: pulse 2s infinite;
+          width: 40px;
+          height: 40px;
         }
 
         .neural-circuit::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            border: 2px solid var(--accent-secondary);
-            border-radius: 50%;
-            animation: pulse 2s infinite 0.5s;
+          width: 20px;
+          height: 20px;
         }
 
         .neural-circuit::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 10px;
-            height: 10px;
-            background: var(--accent-primary);
-            border-radius: 50%;
-            animation: pulse 2s infinite 1s;
+          width: 6px;
+          height: 6px;
         }
-
-        /* Animations */
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        @keyframes particlesFloat {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            33% { transform: translateY(-20px) rotate(120deg); }
-            66% { transform: translateY(20px) rotate(240deg); }
-        }
-
-        @keyframes scanLine {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        @keyframes glitch {
-            0%, 100% { transform: translate(0); }
-            10% { transform: translate(-2px, 2px); }
-            20% { transform: translate(2px, -2px); }
-            30% { transform: translate(-2px, -2px); }
-            40% { transform: translate(2px, 2px); }
-            50% { transform: translate(-2px, 2px); }
-            60% { transform: translate(2px, -2px); }
-            70% { transform: translate(-2px, -2px); }
-            80% { transform: translate(2px, 2px); }
-            90% { transform: translate(-2px, 2px); }
-        }
-
-        @keyframes pulse {
-            0% {
-                box-shadow: 0 0 10px var(--accent-primary), 0 0 20px var(--accent-primary);
-            }
-            50% {
-                box-shadow: 0 0 20px var(--accent-primary), 0 0 40px var(--accent-primary);
-            }
-            100% {
-                box-shadow: 0 0 10px var(--accent-primary), 0 0 20px var(--accent-primary);
-            }
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .container {
-                padding: 3rem 2rem;
-            }
-            
-            .error-code {
-                font-size: 6rem;
-            }
-            
-            .error-title {
-                font-size: 2rem;
-            }
-            
-            .error-message {
-                font-size: 1.1rem;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 2rem 1.5rem;
-            }
-            
-            .error-code {
-                font-size: 4rem;
-            }
-            
-            .error-title {
-                font-size: 1.5rem;
-            }
-            
-            .error-message {
-                font-size: 1rem;
-            }
-            
-            .neural-circuit {
-                width: 40px;
-                height: 40px;
-            }
-            
-            .neural-circuit::before {
-                width: 20px;
-                height: 20px;
-            }
-            
-            .neural-circuit::after {
-                width: 6px;
-                height: 6px;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="neural-circuit"></div>
-    
+
     <div class="container">
-        <div class="error-code">404</div>
-        <h1 class="error-title">Page Not Found</h1>
-        <p class="error-message">The requested page does not exist in our digital matrix.</p>
-        <p class="error-description">
-            It seems you've ventured into uncharted digital territory. The connection you're looking for 
-            has been severed or never existed in our neural network.
-        </p>
-        
-        <div class="action-buttons">
-            <a href="/" class="btn">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                </svg>
-                Enter AndresAI Chat
-            </a>
-            <a href="javascript:history.back()" class="btn btn-secondary">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"/>
-                </svg>
-                Return to Previous
-            </a>
-        </div>
+      <div class="error-code">404</div>
+      <h1 class="error-title">Page Not Found</h1>
+      <p class="error-message">The requested page does not exist in our digital matrix.</p>
+      <p class="error-description">
+        It seems you've ventured into uncharted digital territory. The connection you're looking for has been severed or
+        never existed in our neural network.
+      </p>
+
+      <div class="action-buttons">
+        <a href="/" class="btn">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          Enter AndresAI Chat
+        </a>
+        <a href="javascript:history.back()" class="btn btn-secondary">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          Return to Previous
+        </a>
+      </div>
     </div>
-</body>
+  </body>
 </html>
