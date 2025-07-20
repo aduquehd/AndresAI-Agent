@@ -27,6 +27,7 @@ dependencies = [
 
 [tool.ruff]
 line-length = 100
+exclude = ["alembic/versions/*"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
