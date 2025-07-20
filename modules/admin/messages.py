@@ -18,6 +18,7 @@ class MessagesAdmin(ModelView, model=Message):
         Message.id,
         "user.id",
         Message.direction,
+        Message.ip_address,
         Message.created_at,
         "message",
     ]

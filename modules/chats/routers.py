@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from typing import Annotated
 
 import logfire
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import Response, StreamingResponse
 from openai import AsyncOpenAI
 from pydantic_ai.messages import (
@@ -26,6 +26,26 @@ from utils.database import get_session
 
 
 router = APIRouter()
+
+
+def get_client_ip(request: Request) -> str:
+    """Extract client IP address, handling proxies and load balancers."""
+    # Check X-Forwarded-For header (common with proxies/load balancers)
+    forwarded_for = request.headers.get("X-Forwarded-For")
+    if forwarded_for:
+        # X-Forwarded-For can contain multiple IPs, take the first one (original client)
+        return forwarded_for.split(",")[0].strip()
+    
+    # Check X-Real-IP header (nginx proxy)
+    real_ip = request.headers.get("X-Real-IP")
+    if real_ip:
+        return real_ip.strip()
+    
+    # Fall back to client.host (direct connection)
+    if request.client:
+        return request.client.host
+    
+    return "unknown"
 
 
 @router.get("/history")
@@ -60,12 +80,14 @@ async def get_chat(
 
 @router.post("/send")
 async def post_chat(
+    request: Request,
     user_id: Annotated[str, Depends(get_user_id_from_auth_header)],
     prompt: Annotated[str, Form()],
     session: AsyncSession = Depends(get_session),
 ) -> StreamingResponse:
     user = await get_user_by_username(session, user_id)
     now = datetime.now(timezone.utc)
+    client_ip = get_client_ip(request)
 
     if not user:
         user = User(username=user_id)
@@ -120,6 +142,7 @@ async def post_chat(
             user_id=user.id,
             created_at=now,
             direction=MessageDirectionEnum.outgoing,
+            ip_address=client_ip,
         )
         await add_message(session, new_message)
 
@@ -128,6 +151,7 @@ async def post_chat(
             user_id=user.id,
             created_at=now,
             direction=MessageDirectionEnum.incoming,
+            ip_address=client_ip,
         )
         await add_message(session, new_message)
 

@@ -39,6 +39,7 @@ class Message(SQLModel, table=True):
         sa_column=Column(SqlEnum(MessageDirectionEnum), nullable=False)
     )
     user_id: int = Field(default=None, foreign_key="users.id")
+    ip_address: str | None = Field(default=None, max_length=45)  # IPv6 can be up to 45 chars
 
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc),
