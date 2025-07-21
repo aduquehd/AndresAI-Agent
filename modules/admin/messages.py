@@ -1,7 +1,7 @@
 from markupsafe import Markup
 from sqladmin import ModelView
 
-from modules.admin.utils import format_user_agent
+from modules.admin.utils import format_user_agent, format_datetime_utc5
 from modules.chats.models import AgentMessage, Message, MessageDirectionEnum
 
 
@@ -74,6 +74,7 @@ class MessagesAdmin(ModelView, model=Message):
         else m.message,
         "user_agent": lambda m, _: format_user_agent(m.user_agent) if m.user_agent else None,
         "response_time_ms": lambda m, _: f"{m.response_time_ms}ms" if m.response_time_ms else None,
+        "created_at": lambda m, _: format_datetime_utc5(m.created_at),
         "direction": lambda m, _: Markup(
             f'<span style="color: #4CAF50;"><i class="fa-solid fa-arrow-down"></i> {m.direction.value.title()}</span>'
             if m.direction.value == "incoming"

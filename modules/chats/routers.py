@@ -177,6 +177,7 @@ async def post_chat(
         # Calculate response time
         end_time = time.time()
         response_time_ms = int((end_time - start_time) * 1000)
+        end_datetime = datetime.now(timezone.utc)
 
         # Save user message (outgoing)
         new_message = Message(
@@ -197,7 +198,7 @@ async def post_chat(
         new_message = Message(
             message=agent_response["content"],
             user_id=user.id,
-            created_at=now,
+            created_at=end_datetime,  # Use end time for agent response
             direction=MessageDirectionEnum.incoming,
             ip_address=client_ip,
             user_agent=user_agent,
