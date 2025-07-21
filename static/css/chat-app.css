@@ -1224,9 +1224,6 @@ body::before {
     transform: translateY(0);
   }
 
-  .tech-details-link {
-    display: none;
-  }
 
   .status-text {
     display: none;
