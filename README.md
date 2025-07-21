@@ -147,20 +147,18 @@ The knowledge base is what the Agent uses to get the context of what to do.
 ### Example of Knowledge base:
 
 ```json
-{
-  "kbs": [
-    {
-      "type": "hobbies",
-      "title": "Racing bikes",
-      "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
-    },
-    {
-      "type": "hobbies",
-      "title": "Playing guitar",
-      "content": "Started playing guitar last year, it helps me relax after work."
-    }
-  ]
-}
+[
+  {
+    "type": "hobbies",
+    "title": "Racing bikes",
+    "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
+  },
+  {
+    "type": "hobbies",
+    "title": "Playing guitar",
+    "content": "Started playing guitar last year, it helps me relax after work."
+  }
+]
 ```
 
 # Deployment

@@ -48,16 +48,32 @@ uv run ruff format .
 
 **IMPORTANT**: Always run code formatting after making changes:
 
-#### Python Code
+#### Python Code (Ruff)
 
 ```bash
+# Format all Python files
 uv run ruff format .
+
+# Check for linting issues
+uv run ruff check .
+
+# Fix auto-fixable linting issues
+uv run ruff check . --fix
 ```
 
-#### Frontend Code (HTML, CSS, JS)
+#### Frontend Code (Prettier)
 
 ```bash
+# Format all supported files (HTML, CSS, JS)
 npm run format
+
+# Check formatting without making changes
+npm run format:check
+
+# Format specific file types
+npm run format:html  # HTML templates
+npm run format:css   # CSS files
+npm run format:js    # JavaScript files
 ```
 
 **Complete formatting workflow:**
@@ -136,32 +152,36 @@ The application follows a modular architecture:
    \q
    ```
 
-## Knowledge Base API
+## API Endpoints
 
-The agent's behavior is controlled through the knowledge base API:
+The application provides the following API endpoints:
 
-- `GET /api/kb` - List all knowledge base entries
-- `POST /api/kb` - Add entries (types: "initial_questions", "faq", "hobbies")
-- `DELETE /api/kb/{id}` - Delete specific entry
-- `DELETE /api/kb/delete-all` - Clear all entries
+### Chat API
+- `GET /api/chats/history` - Retrieves chat history for the authenticated user
+- `POST /api/chats/send` - Sends a message to the AI agent and streams the response
+
+### Admin Interface
+- `/admin` - SQLAdmin interface for managing all entities including knowledge base
+
+### Knowledge Base Management
+
+The agent's behavior is controlled through the knowledge base, which is managed via the admin panel at `/admin`. The knowledge base API endpoints are currently disabled but can be found commented out in `modules/knowledge_base/routers.py`.
 
 ### Example Knowledge Base Entry:
 
 ```json
-{
-  "kbs": [
-    {
-      "type": "hobbies",
-      "title": "Racing bikes",
-      "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
-    },
-    {
-      "type": "hobbies",
-      "title": "Playing guitar",
-      "content": "Started playing guitar last year, it helps me relax after work."
-    }
-  ]
-}
+[
+  {
+    "type": "hobbies",
+    "title": "Racing bikes",
+    "content": "I've been racing bikes for 3 years, and I love the adrenaline rush."
+  },
+  {
+    "type": "hobbies",
+    "title": "Playing guitar",
+    "content": "Started playing guitar last year, it helps me relax after work."
+  }
+]
 ```
 
 ## Database Schema
@@ -183,3 +203,14 @@ All models extend SQLModel for both ORM and Pydantic validation.
 - For local development with HTTPS issues, update protocol replacements in `chat_app.html`
 - No test suite currently exists - consider adding pytest for new features
 - TypeScript compilation is handled automatically in Docker builds
+
+## Local Database Connection
+
+To connect to the database locally, use:
+- Connection string: `jdbc:postgresql://localhost:5432/chat_agent_db`
+- Username: `chat_user`
+- Password: (as configured in your `.env` file)
+
+## Running the Project
+
+The agent can be accessed through the web UI at `http://localhost:8000/`. Each visitor is automatically assigned a unique UUID stored in localStorage, keeping conversations separate and persistent across sessions.
