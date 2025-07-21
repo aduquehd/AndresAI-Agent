@@ -887,6 +887,7 @@ body::before {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(26, 26, 46, 0.4) 100%);
   backdrop-filter: blur(20px);
   border-top: 1px solid var(--border-glow);
+  border-radius: 0 0 20px 20px;
   position: relative;
   flex-shrink: 0;
 }
@@ -1205,6 +1206,10 @@ body::before {
     border-radius: 15px;
   }
 
+  .input-container {
+    border-radius: 0 0 15px 15px;
+  }
+
   .top-nav {
     padding: 0.75rem 1.5rem;
   }
@@ -1315,6 +1320,10 @@ body::before {
     height: calc(100vh - 1rem);
     height: calc(100svh - 1rem);
     border-radius: 10px;
+  }
+
+  .input-container {
+    border-radius: 0 0 10px 10px;
   }
 
   /* Better keyboard handling */
