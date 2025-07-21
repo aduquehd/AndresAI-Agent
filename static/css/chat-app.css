@@ -147,6 +147,10 @@ body::before {
   transform: translateX(-50%) translateY(0);
 }
 
+.tech-details-link:active {
+  transform: translateY(0) !important;
+}
+
 .portfolio-link svg {
   width: 16px;
   height: 16px;
