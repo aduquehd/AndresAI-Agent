@@ -1327,15 +1327,6 @@ body::before {
     border-radius: 0 0 10px 10px;
   }
 
-  /* Better keyboard handling */
-  .input-container {
-    position: sticky;
-    bottom: 0;
-    background: inherit;
-    backdrop-filter: inherit;
-    z-index: 10;
-  }
-
   /* Adjust chat messages to account for keyboard */
   .chat-messages {
     flex: 1;
@@ -1452,26 +1443,32 @@ body::before {
 
 /* Mobile keyboard handling */
 @media (max-width: 768px) and (pointer: coarse) {
-  /* Use small viewport height to avoid keyboard issues */
+  /* Use large viewport height to maintain consistent sizing */
   .app-container {
-    height: calc(100svh - 2rem) !important;
-    min-height: calc(100svh - 2rem) !important;
+    height: calc(100lvh - 2rem) !important;
+    min-height: calc(100lvh - 2rem) !important;
   }
 
-  /* Keep input container at bottom */
-  .input-container {
-    position: sticky;
-    bottom: 0;
-    background: inherit;
-    backdrop-filter: inherit;
-    border-top: 1px solid rgba(0, 245, 255, 0.1);
+  /* Prevent viewport jumping on focus */
+  body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 
-  /* Ensure chat scrolls properly when keyboard appears */
+  /* Allow scrolling within the app container */
+  .app-container {
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Ensure chat messages can scroll */
   .chat-messages {
     flex: 1;
     min-height: 0;
-    padding-bottom: 0.5rem;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
