@@ -3,6 +3,45 @@ from sqladmin import ModelView
 
 from modules.admin.utils import format_user_agent, format_datetime_utc5
 from modules.chats.models import AgentMessage, Message, MessageDirectionEnum
+import html
+
+
+def _format_message_with_tooltip(message):
+    """Format message with truncated display and alert popup."""
+    if not message:
+        return ""
+    
+    # Truncate display text if too long
+    if len(message) > 60:
+        display_text = message[:60] + "…"
+        # Use base64 encoding to safely pass the message to JavaScript
+        import base64
+        encoded_message = base64.b64encode(message.encode('utf-8')).decode('ascii')
+        
+        return Markup(f'''
+            <div>
+                <span>{html.escape(display_text)}</span>
+                <button 
+                    type="button" 
+                    style="
+                        margin-left: 5px; 
+                        padding: 2px 6px; 
+                        font-size: 10px; 
+                        background: #1976d2; 
+                        color: white; 
+                        border: none; 
+                        border-radius: 3px; 
+                        cursor: pointer;
+                    "
+                    onclick="
+                        var message = atob('{encoded_message}');
+                        alert(message);
+                    "
+                >View</button>
+            </div>
+        ''')
+    else:
+        return html.escape(message)
 
 
 class AgentMessagesAdmin(ModelView, model=AgentMessage):
@@ -69,9 +108,7 @@ class MessagesAdmin(ModelView, model=Message):
         return "User ID | Direction"
 
     column_formatters = {
-        "message": lambda m, _: (m.message[:60] + "…")
-        if m.message and len(m.message) > 60
-        else m.message,
+        "message": lambda m, _: _format_message_with_tooltip(m.message),
         "user_agent": lambda m, _: format_user_agent(m.user_agent) if m.user_agent else None,
         "response_time_ms": lambda m, _: f"{m.response_time_ms}ms" if m.response_time_ms else None,
         "created_at": lambda m, _: format_datetime_utc5(m.created_at),

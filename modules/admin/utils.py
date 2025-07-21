@@ -98,5 +98,5 @@ def format_datetime_utc5(dt):
         utc_dt = dt.replace(tzinfo=timezone.utc)
         local_dt = utc_dt.astimezone(utc_minus_5)
 
-    # Format: "Dec 21, 2024 10:30:45 AM"
-    return local_dt.strftime("%b %d, %Y %I:%M:%S %p")
+    # Format: "Dec 21 10:30:45 AM"
+    return local_dt.strftime("%b %d, %I:%M:%S %p")
