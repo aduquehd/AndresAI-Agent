@@ -938,7 +938,7 @@ body::before {
   border: none;
   outline: none;
   color: var(--text-primary);
-  font-size: 1rem;
+  font-size: 16px;
   font-family: "Exo 2", sans-serif;
   font-weight: 400;
   transition:
@@ -1359,7 +1359,7 @@ body::before {
   }
 
   .message-input {
-    font-size: 0.925rem;
+    font-size: 16px;
   }
 
   .send-button {
