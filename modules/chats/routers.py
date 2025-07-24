@@ -144,6 +144,13 @@ async def post_chat(
         )
         user = await create_user(session, user)
 
+    # Use user's existing location data as fallback if geo_data is empty
+    final_geo_data = {
+        "country": geo_data["country"] or user.country,
+        "region": geo_data["region"] or user.region,
+        "city": geo_data["city"] or user.city,
+    }
+
     async def stream_messages():
         """Streams new line delimited JSON Messages to the client."""
         # stream the user prompt so that can be displayed straight away
@@ -202,9 +209,9 @@ async def post_chat(
             ip_address=client_ip,
             user_agent=user_agent,
             response_time_ms=response_time_ms,
-            country=geo_data["country"],
-            region=geo_data["region"],
-            city=geo_data["city"],
+            country=final_geo_data["country"],
+            region=final_geo_data["region"],
+            city=final_geo_data["city"],
         )
         await add_message(session, new_message)
 
@@ -217,9 +224,9 @@ async def post_chat(
             ip_address=client_ip,
             user_agent=user_agent,
             response_time_ms=response_time_ms,
-            country=geo_data["country"],
-            region=geo_data["region"],
-            city=geo_data["city"],
+            country=final_geo_data["country"],
+            region=final_geo_data["region"],
+            city=final_geo_data["city"],
         )
         await add_message(session, new_message)
 
