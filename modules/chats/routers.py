@@ -55,6 +55,11 @@ def get_user_agent(request: Request) -> str:
     return request.headers.get("User-Agent", "unknown")
 
 
+def get_browser_id(request: Request) -> str:
+    """Extract browser ID from request headers."""
+    return request.headers.get("X-Browser-Id", "unknown")
+
+
 def get_geographic_data(ip_address: str) -> dict:
     """Get geographic information from IP address using ipapi.co (free tier)."""
     if (
@@ -124,10 +129,19 @@ async def post_chat(
     # Capture request metadata
     client_ip = get_client_ip(request)
     user_agent = get_user_agent(request)
+    browser_id = get_browser_id(request)
     geo_data = get_geographic_data(client_ip)
 
     if not user:
-        user = User(username=user_id)
+        user = User(
+            username=user_id,
+            browser_id=browser_id,
+            ip_address=client_ip,
+            user_agent=user_agent,
+            country=geo_data["country"],
+            region=geo_data["region"],
+            city=geo_data["city"],
+        )
         user = await create_user(session, user)
 
     async def stream_messages():

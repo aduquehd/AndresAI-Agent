@@ -1,24 +1,26 @@
+import html
+
 from markupsafe import Markup
 from sqladmin import ModelView
 
-from modules.admin.utils import format_user_agent, format_datetime_utc5
+from modules.admin.utils import format_datetime_utc5, format_user_agent
 from modules.chats.models import AgentMessage, Message, MessageDirectionEnum
-import html
 
 
 def _format_message_with_tooltip(message):
     """Format message with truncated display and alert popup."""
     if not message:
         return ""
-    
+
     # Truncate display text if too long
     if len(message) > 60:
         display_text = message[:60] + "…"
         # Use base64 encoding to safely pass the message to JavaScript
         import base64
-        encoded_message = base64.b64encode(message.encode('utf-8')).decode('ascii')
-        
-        return Markup(f'''
+
+        encoded_message = base64.b64encode(message.encode("utf-8")).decode("ascii")
+
+        return Markup(f"""
             <div>
                 <span>{html.escape(display_text)}</span>
                 <button 
@@ -39,7 +41,7 @@ def _format_message_with_tooltip(message):
                     "
                 >View</button>
             </div>
-        ''')
+        """)
     else:
         return html.escape(message)
 

@@ -1,9 +1,10 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+
 import logfire
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
-from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqladmin import Admin
@@ -59,17 +60,12 @@ logfire.instrument_fastapi(app)
 @app.exception_handler(404)
 async def not_found_handler(request: Request, exc: HTTPException):
     return templates.TemplateResponse(
-        request=request, 
-        name="404.html", 
-        status_code=404,
-        context={"settings": settings}
+        request=request, name="404.html", status_code=404, context={"settings": settings}
     )
 
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse(
-        request=request, 
-        name="chat_app.html",
-        context={"settings": settings}
+        request=request, name="chat_app.html", context={"settings": settings}
     )

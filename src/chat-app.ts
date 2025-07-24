@@ -11,6 +11,7 @@ const formElement = document.querySelector("form") as HTMLFormElement | null;
 
 // Constants
 const STORAGE_KEY = "chat_user_id";
+const BROWSER_ID_KEY = "chat_browser_id";
 const API_ENDPOINTS = {
   sendMessage: "/api/chats/send",
   chatHistory: "/api/chats/history",
@@ -25,6 +26,7 @@ interface Message {
 
 interface ChatState {
   userId: string;
+  browserId: string;
   isLoading: boolean;
   hasMessages: boolean;
 }
@@ -32,6 +34,7 @@ interface ChatState {
 // State management
 const state: ChatState = {
   userId: "",
+  browserId: "",
   isLoading: false,
   hasMessages: false,
 };
@@ -62,9 +65,21 @@ function getUserId(): string {
   return userId;
 }
 
+function getBrowserId(): string {
+  let browserId = localStorage.getItem(BROWSER_ID_KEY);
+
+  if (!browserId) {
+    browserId = generateUUID();
+    localStorage.setItem(BROWSER_ID_KEY, browserId);
+  }
+
+  return browserId;
+}
+
 function createAuthHeaders(): HeadersInit {
   return {
     Authorization: `User-Id ${state.userId}`,
+    "X-Browser-Id": state.browserId,
   };
 }
 
@@ -315,6 +330,7 @@ async function handleSubmit(e: SubmitEvent): Promise<void> {
 function initialize(): void {
   // Initialize state
   state.userId = getUserId();
+  state.browserId = getBrowserId();
 
   // Attach event listeners
   if (formElement) {
