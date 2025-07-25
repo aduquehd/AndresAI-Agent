@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import select, update
 
 from modules.chats.models import AgentMessage, Message
 
@@ -27,3 +27,22 @@ async def get_agent_messages(
     )
     result = await session.exec(query)
     return result.all()
+
+
+async def update_messages_geo_data(
+    session: AsyncSession, user_id: int, country: str | None, region: str | None, city: str | None
+) -> int:
+    """Update messages without geo data for a specific user."""
+    stmt = (
+        update(Message)
+        .where(
+            Message.user_id == user_id,
+            Message.country.is_(None),
+            Message.region.is_(None),
+            Message.city.is_(None),
+        )
+        .values(country=country, region=region, city=city)
+    )
+
+    await session.exec(stmt)
+    await session.commit()

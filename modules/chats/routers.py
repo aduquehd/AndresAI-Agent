@@ -5,7 +5,7 @@ from typing import Annotated
 
 import logfire
 import requests
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, Form, Request
 from fastapi.responses import Response, StreamingResponse
 from openai import AsyncOpenAI
 from pydantic_ai.messages import (
@@ -19,9 +19,9 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from modules.agent.agent import agent
 from modules.chats.models import AgentMessage, Message, MessageDirectionEnum
-from modules.chats.services import add_agent_message, add_message
+from modules.chats.services import add_agent_message, add_message, update_messages_geo_data
 from modules.users.models import User
-from modules.users.services import create_user, get_user_by_username
+from modules.users.services import create_user, get_user_by_username, update_user_geo_data
 from utils.agent import Deps, to_chat_message
 from utils.auth import get_user_id_from_auth_header
 from utils.database import get_session
@@ -85,6 +85,45 @@ def get_geographic_data(ip_address: str) -> dict:
     return {"country": None, "region": None, "city": None}
 
 
+async def update_user_and_messages_geo_background(
+    user: User, geo_data: dict, session: AsyncSession
+):
+    """Background task to update user and message geo data if they don't have it but request does."""
+    try:
+        user_has_geo = any([user.country, user.region, user.city])
+        request_has_geo = any([geo_data["country"], geo_data["region"], geo_data["city"]])
+
+        final_geo_for_update = None
+        if not user_has_geo and request_has_geo:
+            final_geo_for_update = geo_data
+        elif user_has_geo and not request_has_geo:
+            final_geo_for_update = {
+                "country": user.country,
+                "region": user.region,
+                "city": user.city,
+            }
+
+        if final_geo_for_update:
+            if not user_has_geo and request_has_geo:
+                await update_user_geo_data(
+                    session,
+                    user,
+                    final_geo_for_update["country"],
+                    final_geo_for_update["region"],
+                    final_geo_for_update["city"],
+                )
+
+            await update_messages_geo_data(
+                session,
+                user.id,
+                final_geo_for_update["country"],
+                final_geo_for_update["region"],
+                final_geo_for_update["city"],
+            )
+    except Exception:
+        pass
+
+
 @router.get("/history")
 async def get_chat(
     user_id: Annotated[str, Depends(get_user_id_from_auth_header)],
@@ -118,6 +157,7 @@ async def get_chat(
 @router.post("/send")
 async def post_chat(
     request: Request,
+    background_tasks: BackgroundTasks,
     user_id: Annotated[str, Depends(get_user_id_from_auth_header)],
     prompt: Annotated[str, Form()],
     session: AsyncSession = Depends(get_session),
@@ -143,6 +183,8 @@ async def post_chat(
             city=geo_data["city"],
         )
         user = await create_user(session, user)
+    else:
+        background_tasks.add_task(update_user_and_messages_geo_background, user, geo_data, session)
 
     # Use user's existing location data as fallback if geo_data is empty
     final_geo_data = {

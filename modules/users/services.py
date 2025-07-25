@@ -15,3 +15,15 @@ async def create_user(session: AsyncSession, user: User) -> User | None:
     await session.commit()
     await session.refresh(user)
     return user
+
+
+async def update_user_geo_data(
+    session: AsyncSession, user: User, country: str | None, region: str | None, city: str | None
+) -> User:
+    user.country = country
+    user.region = region
+    user.city = city
+    session.add(user)
+    await session.commit()
+    await session.refresh(user)
+    return user
