@@ -1,3 +1,4 @@
+import hashlib
 import html
 
 from markupsafe import Markup
@@ -5,6 +6,56 @@ from sqladmin import ModelView
 
 from modules.admin.utils import format_datetime_utc5, format_user_agent
 from modules.chats.models import AgentMessage, Message, MessageDirectionEnum
+
+
+def _generate_user_color(user_id):
+    """Generate a consistent color for a user ID using hash."""
+    if not user_id:
+        return "#666666"  # Default gray for None values
+
+    # Create hash of user ID and take first 6 characters for color
+    hash_object = hashlib.md5(str(user_id).encode())
+    hex_dig = hash_object.hexdigest()[:6]
+
+    # Ensure the color is not too light (minimum brightness)
+    color = f"#{hex_dig}"
+
+    # Convert to RGB to check brightness and adjust if needed
+    r = int(hex_dig[0:2], 16)
+    g = int(hex_dig[2:4], 16)
+    b = int(hex_dig[4:6], 16)
+
+    # Calculate brightness (0-255)
+    brightness = (r * 299 + g * 587 + b * 114) / 1000
+
+    # If too light, darken it
+    if brightness > 180:
+        r = max(0, r - 80)
+        g = max(0, g - 80)
+        b = max(0, b - 80)
+        color = f"#{r:02x}{g:02x}{b:02x}"
+
+    return color
+
+
+def _format_user_id_with_highlight(message, _):
+    """Format user ID with consistent color highlighting."""
+    if not message.user_id:
+        return "N/A"
+
+    user_id = message.user_id
+    color = _generate_user_color(user_id)
+
+    return Markup(f"""
+        <span style="
+            background-color: {color}; 
+            color: white; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-weight: bold;
+            font-size: 11px;
+        ">{user_id}</span>
+    """)
 
 
 def _format_message_with_tooltip(message):
@@ -110,6 +161,7 @@ class MessagesAdmin(ModelView, model=Message):
         return "User ID | Direction"
 
     column_formatters = {
+        "user.id": _format_user_id_with_highlight,
         "message": lambda m, _: _format_message_with_tooltip(m.message),
         "user_agent": lambda m, _: format_user_agent(m.user_agent) if m.user_agent else None,
         "response_time_ms": lambda m, _: f"{m.response_time_ms}ms" if m.response_time_ms else None,
