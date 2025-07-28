@@ -1,105 +1,167 @@
-# AI Agent Chatbot
+<div align="center">
 
-A production-ready AI chatbot system built with FastAPI that supports web interfaces. The system uses OpenAI for AI capabilities and PostgreSQL with pgvector for semantic search in the knowledge base.
+# 🤖 AI Agent Chatbot
 
-## Features
+<a href="https://andres-ai.aduquehd.com/">
+  <img src="https://img.shields.io/badge/🔗%20Live%20Demo-Visit%20Site-blue?style=for-the-badge" alt="Live Demo">
+</a>
 
-- 🤖 AI-powered conversational interface
-- 🌐 Modern web chat UI with real-time streaming
-- 🔍 Semantic search with vector embeddings
-- 📊 Admin panel for knowledge base management
-- 🔒 Secure authentication and session management
-- 🐳 Full Docker containerization
+[![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
 
-## Prerequisites
+**A production-ready AI chatbot system built with modern web technologies**
 
-- Docker and Docker Compose
-- Node.js and npm (for TypeScript compilation)
-- OpenAI API key
+[Features](#features) • [Quick Start](#quick-start) • [Development](#development) • [Deployment](#deployment)
 
-## Quick Start
+</div>
 
-1. **Clone the repository**
+---
+
+## ✨ Features
+
+<table>
+<tr>
+<td>
+
+### 🚀 Core Features
+- 🤖 **AI-Powered Chat** - Intelligent conversational interface
+- 🌐 **Modern Web UI** - Real-time streaming responses
+- 🔍 **Semantic Search** - Vector embeddings with pgvector
+- 📊 **Admin Panel** - Easy knowledge base management
+
+</td>
+<td>
+
+### 🛡️ Production Ready
+- 🔒 **Secure Auth** - Session management & authentication
+- 🐳 **Dockerized** - Full container orchestration
+- 📈 **Scalable** - Async architecture with FastAPI
+- 🔧 **Configurable** - Environment-based configuration
+
+</td>
+</tr>
+</table>
+
+## 📋 Prerequisites
+
+<table>
+<tr>
+<td align="center">
+<img src="https://raw.githubusercontent.com/docker/compose/main/logo.png" width="60" height="60" alt="Docker">
+<br>
+<b>Docker & Compose</b>
+</td>
+<td align="center">
+<img src="https://raw.githubusercontent.com/nodejs/nodejs.org/main/static/images/logo.svg" width="60" height="60" alt="Node.js">
+<br>
+<b>Node.js & npm</b>
+</td>
+<td align="center">
+<img src="https://upload.wikimedia.org/wikipedia/commons/4/4d/OpenAI_Logo.svg" width="60" height="60" alt="OpenAI">
+<br>
+<b>OpenAI API Key</b>
+</td>
+</tr>
+</table>
+
+## 🚀 Quick Start
+
+### 1️⃣ **Clone the repository**
 
 ```bash
 git clone <repository-url>
 cd AI_agent
 ```
 
-2. **Install dependencies**
+### 2️⃣ **Install dependencies**
 
 ```bash
 npm install
 npm run build
 ```
 
-3. **Create environment file**
-   Copy `.env.example` to `.env` and fill in your values:
+### 3️⃣ **Create environment file**
 
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your configuration:
+<details>
+<summary>📝 <b>Environment Configuration</b> (click to expand)</summary>
 
 ```dotenv
-# OpenAI API Configuration
+# 🔑 OpenAI API Configuration
 OPENAI_API_KEY=sk-proj-your-openai-api-key-here
 
-# Logfire Configuration (optional - for observability)
+# 📊 Logfire Configuration (optional - for observability)
 LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
 
-# Database Configuration
+# 🗄️ Database Configuration
 DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
 POSTGRES_USER=chat_user
 POSTGRES_PASSWORD=your_secure_password
 POSTGRES_DB=chat_agent_db
 
-# FastAPI Admin
+# 👤 FastAPI Admin
 ADMIN_USER=admin
 ADMIN_PASSWORD='your_secure_admin_password'
 FASTAPI_ADMIN_SECRET_KEY='your_secret_key_here_32_chars_min'
 
-# Application Configuration
+# ⚙️ Application Configuration
 APP_ENV=development
 DEBUG=false
 
-# Analytics Configuration (optional)
+# 📈 Analytics Configuration (optional)
 GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
 ```
 
-4. **Build and start the services**
+</details>
+
+### 4️⃣ **Build and start the services**
 
 ```bash
 docker compose build
 docker compose up
 ```
 
-5. **Set up the pgvector extension**
-   In another terminal, run:
+### 5️⃣ **Set up the pgvector extension**
 
 ```bash
+# In another terminal
 docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db
 ```
-
-Then execute:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
 ```
 
-6. **Access the application**
+### 6️⃣ **Access the application**
 
-- Chat UI: http://localhost:8000/
-- Admin panel: http://localhost:8000/admin
+<table>
+<tr>
+<td align="center">
+<h4>💬 Chat Interface</h4>
+<a href="http://localhost:8000/">http://localhost:8000/</a>
+</td>
+<td align="center">
+<h4>⚙️ Admin Panel</h4>
+<a href="http://localhost:8000/admin">http://localhost:8000/admin</a>
+</td>
+</tr>
+</table>
 
-## Development
+## 💻 Development
 
-### Code Formatting
+### 🎨 Code Formatting
 
-This project uses multiple formatters for different file types:
+<table>
+<tr>
+<td>
 
-#### Python Code (Ruff)
+#### 🐍 Python Code (Ruff)
 
 ```bash
 # Format all Python files
@@ -108,43 +170,51 @@ uv run ruff format .
 # Check for linting issues
 uv run ruff check .
 
-# Fix auto-fixable linting issues
+# Fix auto-fixable issues
 uv run ruff check . --fix
 ```
 
-#### Frontend Code (Prettier)
+</td>
+<td>
+
+#### 🌐 Frontend Code (Prettier)
 
 ```bash
-# Format all supported files (HTML, CSS, JS)
+# Format all files
 npm run format
 
-# Check formatting without making changes
+# Check formatting
 npm run format:check
 
-# Format specific file types
-npm run format:html  # HTML templates
-npm run format:css   # CSS files
-npm run format:js    # JavaScript files
+# Format specific types
+npm run format:html
+npm run format:css
+npm run format:js
 ```
 
-**Important**: Always run both formatters after making code changes:
+</td>
+</tr>
+</table>
 
-- `uv run ruff format .` for Python files
-- `npm run format` for HTML, CSS, and JavaScript files
+> ⚠️ **Important**: Always run both formatters after making changes:
+> ```bash
+> uv run ruff format . && npm run format
+> ```
 
-## Local DB connect.
+### 🗄️ Database Connection
 
-To connect to the database locally, connect using `jdbc:postgresql://localhost:5432/chat_agent_db` with username `chat_user`.
+```yaml
+Connection String: jdbc:postgresql://localhost:5432/chat_agent_db
+Username: chat_user
+Password: (from your .env file)
+```
 
-## Running the project properly.
+## 🎯 Configuring the Agent
 
-The agent can be used through the web UI at `http://localhost:8000/`. Each visitor is automatically assigned a unique UUID stored in localStorage, keeping conversations separate and persistent across sessions.
+The knowledge base powers your AI agent's contextual understanding. Manage it through the admin panel at `/admin`.
 
-## Configuring the Agent
-
-The knowledge base is what the Agent uses to get the context of what to do.
-
-### Example of Knowledge base:
+<details>
+<summary>📚 <b>Knowledge Base Example</b> (click to expand)</summary>
 
 ```json
 [
@@ -161,60 +231,88 @@ The knowledge base is what the Agent uses to get the context of what to do.
 ]
 ```
 
-# Deployment
+</details>
 
-Since the project is using Docker and Docker compose, the deployment is very simple.
+# 🚢 Deployment
 
-PD: You may need to use `sudo` in all docker commands, like `sudo docker compose ...`.
+> 💡 **Note**: You may need to use `sudo` for all docker commands.
 
-- Install Docker in the machine.
-- Create a `.env` file:
-- Make sure the domain at `compose/prod/Caddyfile` is correct.
+### Prerequisites
+
+- ✅ Install Docker on your server
+- ✅ Configure your domain in `compose/prod/Caddyfile`
+- ✅ Create production `.env` file
+
+<details>
+<summary>🔐 <b>Production Environment Variables</b> (click to expand)</summary>
 
 ```dotenv
-# OpenAI API Configuration
+# 🔑 OpenAI API Configuration
 OPENAI_API_KEY=sk-proj-your-openai-api-key-here
 
-# Logfire Configuration (optional - for observability)
+# 📊 Logfire Configuration (optional)
 LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
 
-# Database Configuration
+# 🗄️ Database Configuration
 DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
 POSTGRES_USER=chat_user
 POSTGRES_PASSWORD=your_secure_password
 POSTGRES_DB=chat_agent_db
 
-# FastAPI Admin
+# 👤 FastAPI Admin
 ADMIN_USER=admin
 ADMIN_PASSWORD='your_secure_admin_password'
 FASTAPI_ADMIN_SECRET_KEY='your_secret_key_here_32_chars_min'
 
-# Application Configuration
-APP_ENV=development
+# ⚙️ Application Configuration
+APP_ENV=production
 DEBUG=false
 
-# Analytics Configuration (optional)
+# 📈 Analytics Configuration (optional)
 GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
 ```
 
-- `docker compose -f docker-compose.prod.yml build`
-- `docker compose -f docker-compose.prod.yml up`
-- Set up the pgvector extension:
-  - Run `docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db`
-  - Run `CREATE EXTENSION IF NOT EXISTS vector;`
-  - Close the session typing `\q`.
-- Let's try opening the URL `{domain}/`.
+</details>
 
-## Re-deployment
+### 🚀 Deploy Steps
 
-To deploy any changes, just run the script `source deploy-server.sh`
+```bash
+# 1. Build the production images
+docker compose -f docker-compose.prod.yml build
 
-## Optionally setup Supervisor to run the project.
+# 2. Start the services
+docker compose -f docker-compose.prod.yml up -d
 
-- `sudo apt install supervisor -y`
-- Create a conf file: `sudo nano /etc/supervisor/conf.d/ai_agent.conf`
+# 3. Setup pgvector extension
+docker exec -it ai_agent_db psql -U chat_user -d chat_agent_db -c "CREATE EXTENSION IF NOT EXISTS vector;"
 
+# 4. Visit your application
+# https://your-domain.com
 ```
+
+### 🔄 Re-deployment
+
+```bash
+# Quick redeploy with existing script
+source deploy-server.sh
+```
+
+## 🛠️ Production Setup with Supervisor
+
+<details>
+<summary>⚡ <b>Auto-restart Configuration</b> (click to expand)</summary>
+
+### 1. Install Supervisor
+```bash
+sudo apt install supervisor -y
+```
+
+### 2. Create Configuration
+```bash
+sudo nano /etc/supervisor/conf.d/ai_agent.conf
+```
+
+```ini
 [program:ai_agent]
 directory=/home/ubuntu/AI_agent
 command=sudo /usr/bin/docker compose -f docker-compose.prod.yml up
@@ -224,13 +322,31 @@ stderr_logfile=/var/log/ai_agent.err.log
 stdout_logfile=/var/log/ai_agent.out.log
 ```
 
-- `sudo supervisorctl reread`
-- `sudo supervisorctl update`
-- `sudo supervisorctl start ai_agent`
-- PD: The logs can be shown at `sudo tail -f /var/log/ai_agent.out.log`.
+### 3. Apply Configuration
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start ai_agent
+```
 
-If you would like to see better logs for debugging, stop ai_agent
-and run docker compose manually.
+### 📋 Useful Commands
+```bash
+# View logs
+sudo tail -f /var/log/ai_agent.out.log
 
-- `sudo supervisorctl stop ai_agent`
-- `docker compose -f docker-compose.prod.yml up`
+# Stop for debugging
+sudo supervisorctl stop ai_agent
+docker compose -f docker-compose.prod.yml up
+```
+
+</details>
+
+---
+
+<div align="center">
+
+**Built with ❤️ using modern web technologies**
+
+[![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
+
+</div>
