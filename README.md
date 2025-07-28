@@ -55,7 +55,7 @@
 <b>Docker & Compose</b>
 </td>
 <td align="center">
-<img src="https://raw.githubusercontent.com/nodejs/nodejs.org/main/static/images/logo.svg" width="60" height="60" alt="Node.js">
+<img src="https://nodejs.org/static/images/logo.svg" width="60" height="60" alt="Node.js">
 <br>
 <b>Node.js & npm</b>
 </td>
@@ -165,13 +165,13 @@ CREATE EXTENSION IF NOT EXISTS vector;
 
 ```bash
 # Format all Python files
-uv run ruff format .
+docker compose run --rm backend uv run ruff format .
 
 # Check for linting issues
-uv run ruff check .
+docker compose run --rm backend uv run ruff check .
 
 # Fix auto-fixable issues
-uv run ruff check . --fix
+docker compose run --rm backend uv run ruff check . --fix
 ```
 
 </td>
@@ -198,7 +198,7 @@ npm run format:js
 
 > ⚠️ **Important**: Always run both formatters after making changes:
 > ```bash
-> uv run ruff format . && npm run format
+> docker compose run --rm backend uv run ruff format . && npm run format
 > ```
 
 ### 🗄️ Database Connection
