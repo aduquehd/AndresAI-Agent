@@ -1,6 +1,15 @@
 // @ts-ignore - External ES module
 import { marked } from "https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.0/lib/marked.esm.js";
 
+// Configure marked to open links in new tabs
+const renderer = new marked.Renderer();
+const originalLinkRenderer = renderer.link.bind(renderer);
+renderer.link = (href: string, title: string | null, text: string) => {
+    const html = originalLinkRenderer(href, title, text);
+    return html.replace('<a ', '<a target="_blank" rel="noopener noreferrer" ');
+};
+marked.setOptions({ renderer });
+
 // DOM Elements with proper typing
 const convElement = document.getElementById("conversation") as HTMLDivElement | null;
 const promptInput = document.getElementById("prompt-input") as HTMLInputElement | null;
