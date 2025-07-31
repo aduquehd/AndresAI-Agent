@@ -17,7 +17,7 @@ from modules.admin.knowledge_base import KnowledgeBaseAdmin
 from modules.admin.messages import AgentMessagesAdmin, MessagesAdmin
 from modules.admin.user import UserAdmin
 from modules.chats.routers import router as chats_router
-from utils.database import engine
+from modules.utils.database import engine
 
 
 async def create_db_and_tables():

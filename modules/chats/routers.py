@@ -4,7 +4,6 @@ from datetime import datetime, timezone
 from typing import Annotated
 
 import logfire
-import requests
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, Request
 from fastapi.responses import Response, StreamingResponse
 from openai import AsyncOpenAI
@@ -19,109 +18,49 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from modules.agent.agent import agent
 from modules.chats.models import AgentMessage, Message, MessageDirectionEnum
-from modules.chats.services import add_agent_message, add_message, update_messages_geo_data
+from modules.chats.services import add_agent_message, add_message
+from modules.chats.utils.geo import update_user_and_messages_geo_background
 from modules.users.models import User
-from modules.users.services import create_user, get_user_by_username, update_user_geo_data
-from utils.agent import Deps, to_chat_message
-from utils.auth import get_user_id_from_auth_header
-from utils.database import get_session
+from modules.users.services import create_user, get_user_by_username
+from modules.utils.agent import Deps, to_chat_message
+from modules.utils.auth import get_user_id_from_auth_header
+from modules.utils.database import get_session
+from modules.utils.geo import get_geographic_data
+from modules.utils.request import get_browser_id, get_client_ip, get_user_agent
 
 
 router = APIRouter()
 
 
-def get_client_ip(request: Request) -> str:
-    """Extract client IP address, handling proxies and load balancers."""
-    # Check X-Forwarded-For header (common with proxies/load balancers)
-    forwarded_for = request.headers.get("X-Forwarded-For")
-    if forwarded_for:
-        # X-Forwarded-For can contain multiple IPs, take the first one (original client)
-        return forwarded_for.split(",")[0].strip()
+async def _get_user_geo_data(
+    user: User | None,
+    client_ip: str,
+    background_tasks: BackgroundTasks,
+    session: AsyncSession,
+) -> dict[str, str | None]:
+    """Get or update user geographic data.
 
-    # Check X-Real-IP header (nginx proxy)
-    real_ip = request.headers.get("X-Real-IP")
-    if real_ip:
-        return real_ip.strip()
-
-    # Fall back to client.host (direct connection)
-    if request.client:
-        return request.client.host
-
-    return "unknown"
-
-
-def get_user_agent(request: Request) -> str:
-    """Extract user agent string from request headers."""
-    return request.headers.get("User-Agent", "unknown")
-
-
-def get_browser_id(request: Request) -> str:
-    """Extract browser ID from request headers."""
-    return request.headers.get("X-Browser-Id", "unknown")
-
-
-def get_geographic_data(ip_address: str) -> dict:
-    """Get geographic information from IP address using ipapi.co (free tier)."""
-    if (
-        ip_address in ["unknown", "127.0.0.1", "::1"]
-        or ip_address.startswith("192.168.")
-        or ip_address.startswith("10.")
-    ):
-        return {"country": None, "region": None, "city": None}
-
-    try:
-        # Use ipapi.co free service (1000 requests/month, no API key needed)
-        response = requests.get(f"https://ipapi.co/{ip_address}/json/", timeout=3)
-        if response.status_code == 200:
-            data = response.json()
-            return {
-                "country": data.get("country_code"),
-                "region": data.get("region"),
-                "city": data.get("city"),
-            }
-    except Exception as e:
-        logfire.warn("Failed to get geographic data", ip=ip_address, error=str(e))
-
-    return {"country": None, "region": None, "city": None}
-
-
-async def update_user_and_messages_geo_background(
-    user: User, geo_data: dict, session: AsyncSession
-):
-    """Background task to update user and message geo data if they don't have it but request does."""
-    try:
-        user_has_geo = any([user.country, user.region, user.city])
-        request_has_geo = any([geo_data["country"], geo_data["region"], geo_data["city"]])
-
-        final_geo_for_update = None
-        if not user_has_geo and request_has_geo:
-            final_geo_for_update = geo_data
-        elif user_has_geo and not request_has_geo:
-            final_geo_for_update = {
+    Returns a dict with country, region, and city keys.
+    If user exists and has geo data, returns user's data.
+    If user exists but lacks geo data, fetches it and schedules background update.
+    If user doesn't exist, fetches geo data from IP.
+    """
+    if user:
+        if not any([user.country, user.region, user.city]):
+            geo_data = get_geographic_data(client_ip)
+            background_tasks.add_task(
+                update_user_and_messages_geo_background, user, geo_data, session
+            )
+        else:
+            geo_data = {
                 "country": user.country,
                 "region": user.region,
                 "city": user.city,
             }
+    else:
+        geo_data = get_geographic_data(client_ip)
 
-        if final_geo_for_update:
-            if not user_has_geo and request_has_geo:
-                await update_user_geo_data(
-                    session,
-                    user,
-                    final_geo_for_update["country"],
-                    final_geo_for_update["region"],
-                    final_geo_for_update["city"],
-                )
-
-            await update_messages_geo_data(
-                session,
-                user.id,
-                final_geo_for_update["country"],
-                final_geo_for_update["region"],
-                final_geo_for_update["city"],
-            )
-    except Exception:
-        pass
+    return geo_data
 
 
 @router.get("/history")
@@ -166,11 +105,11 @@ async def post_chat(
     now = datetime.now(timezone.utc)
     start_time = time.time()
 
-    # Capture request metadata
     client_ip = get_client_ip(request)
     user_agent = get_user_agent(request)
     browser_id = get_browser_id(request)
-    geo_data = get_geographic_data(client_ip)
+
+    geo_data = await _get_user_geo_data(user, client_ip, background_tasks, session)
 
     if not user:
         user = User(
@@ -183,15 +122,6 @@ async def post_chat(
             city=geo_data["city"],
         )
         user = await create_user(session, user)
-    else:
-        background_tasks.add_task(update_user_and_messages_geo_background, user, geo_data, session)
-
-    # Use user's existing location data as fallback if geo_data is empty
-    final_geo_data = {
-        "country": geo_data["country"] or user.country,
-        "region": geo_data["region"] or user.region,
-        "city": geo_data["city"] or user.city,
-    }
 
     async def stream_messages():
         """Streams new line delimited JSON Messages to the client."""
@@ -251,9 +181,9 @@ async def post_chat(
             ip_address=client_ip,
             user_agent=user_agent,
             response_time_ms=response_time_ms,
-            country=final_geo_data["country"],
-            region=final_geo_data["region"],
-            city=final_geo_data["city"],
+            country=geo_data["country"],
+            region=geo_data["region"],
+            city=geo_data["city"],
         )
         await add_message(session, new_message)
 
@@ -266,9 +196,9 @@ async def post_chat(
             ip_address=client_ip,
             user_agent=user_agent,
             response_time_ms=response_time_ms,
-            country=final_geo_data["country"],
-            region=final_geo_data["region"],
-            city=final_geo_data["city"],
+            country=geo_data["country"],
+            region=geo_data["region"],
+            city=geo_data["city"],
         )
         await add_message(session, new_message)
 

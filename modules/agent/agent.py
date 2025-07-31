@@ -8,7 +8,7 @@ from pydantic_ai import Agent, RunContext
 from modules.agent.services import get_agent_context
 from modules.knowledge_base.models import KnowledgeBaseTypeEnum
 from modules.knowledge_base.services import get_knowledge_base_embedding_list
-from utils.agent import Deps
+from modules.utils.agent import Deps
 
 
 logfire.configure(send_to_logfire="if-token-present")
