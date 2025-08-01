@@ -75,17 +75,17 @@ body {
   --glass-border: rgba(0, 0, 0, 0.1);
 
   /* Theme-specific colors */
-  --status-dot-color: #4ade80;
-  --status-dot-shadow1: rgba(74, 222, 128, 0.5);
-  --status-dot-shadow2: rgba(74, 222, 128, 0.3);
+  --status-dot-color: #10b981;
+  --status-dot-shadow1: rgba(16, 185, 129, 0.4);
+  --status-dot-shadow2: rgba(16, 185, 129, 0.2);
   --app-container-bg: rgba(255, 255, 255, 0.95);
   --app-container-border: rgba(0, 0, 0, 0.1);
-  --top-nav-bg: linear-gradient(135deg, rgba(0, 102, 204, 0.03) 0%, rgba(233, 30, 99, 0.03) 100%);
-  --scanline-color: rgba(0, 102, 204, 0.05);
-  --portfolio-link-bg: rgba(255, 255, 255, 0.8);
-  --portfolio-link-hover-bg: var(--accent-primary);
-  --email-container-bg: rgba(255, 255, 255, 0.8);
-  --social-link-bg: rgba(255, 255, 255, 0.8);
+  --top-nav-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.02) 0%, rgba(236, 72, 153, 0.02) 100%);
+  --scanline-color: rgba(99, 102, 241, 0.03);
+  --portfolio-link-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+  --portfolio-link-hover-bg: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(236, 72, 153, 0.1) 100%);
+  --email-container-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+  --social-link-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
   --chat-grid-color: rgba(0, 102, 204, 0.02);
   --scrollbar-track: rgba(0, 0, 0, 0.05);
   --scrollbar-thumb: rgba(0, 102, 204, 0.5);
@@ -211,17 +211,29 @@ body::before {
 }
 
 :root[data-theme="light"] .portfolio-link:hover {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.2);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(236, 72, 153, 0.08) 100%);
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: 
+    0 4px 15px rgba(99, 102, 241, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+:root[data-theme="light"] .tech-details-link:hover {
+  transform: translateX(-50%) translateY(-2px);
+}
+
+:root[data-theme="light"] .tech-details-link:active {
+  transform: translateX(-50%) translateY(0);
 }
 
 .tech-details-link {
-  position: static;
-  transform: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .tech-details-link:hover {
-  transform: translateY(-2px);
+  transform: translateX(-50%) translateY(-2px);
 }
 
 .portfolio-link:active {
@@ -229,13 +241,38 @@ body::before {
 }
 
 .tech-details-link:active {
-  transform: translateY(0) !important;
+  transform: translateX(-50%) translateY(0);
 }
 
 .portfolio-link svg {
   width: 16px;
   height: 16px;
   filter: drop-shadow(0 0 3px var(--border-glow));
+}
+
+:root[data-theme="light"] .portfolio-link {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.9) 100%);
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+:root[data-theme="light"] .portfolio-link::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: -1;
+  margin: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
+}
+
+:root[data-theme="light"] .tech-details-link {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 :root[data-theme="light"] .portfolio-link svg {
@@ -1257,9 +1294,14 @@ body::before {
 }
 
 :root[data-theme="light"] .theme-toggle:hover {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.2);
+  background: rgba(250, 250, 250, 0.95);
   text-shadow: none;
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 .theme-toggle:active {
@@ -1275,7 +1317,12 @@ body::before {
 }
 
 :root[data-theme="light"] .theme-toggle {
-  border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  position: relative;
+  box-shadow: 
+    0 1px 3px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 :root[data-theme="light"] .theme-toggle svg {
@@ -1298,12 +1345,20 @@ body::before {
 :root[data-theme="light"] .sun-icon {
   opacity: 1;
   transform: rotate(0deg) scale(1);
-  color: #f59e0b;
+  color: #1a1a1a;
 }
 
 :root[data-theme="light"] .theme-toggle:hover .sun-icon {
-  color: #f59e0b;
-  filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.5));
+  color: #000000;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 20px rgba(236, 72, 153, 0.3));
+  }
 }
 
 :root[data-theme="light"] .moon-icon {
