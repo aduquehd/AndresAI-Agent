@@ -4,7 +4,7 @@ from pathlib import Path
 import logfire
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqladmin import Admin
@@ -69,3 +69,13 @@ async def index(request: Request):
     return templates.TemplateResponse(
         request=request, name="chat_app.html", context={"settings": settings}
     )
+
+
+@app.get("/robots.txt")
+async def robots():
+    return FileResponse("robots.txt", media_type="text/plain")
+
+
+@app.get("/sitemap.xml")
+async def sitemap():
+    return FileResponse("sitemap.xml", media_type="application/xml")
