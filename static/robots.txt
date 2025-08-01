@@ -1,0 +1,25 @@
+# AndresAI Agent Robots.txt
+# https://andresai.aduquehd.com
+
+User-agent: *
+Allow: /
+
+# Allow all major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+# Disallow API endpoints from crawling
+Disallow: /api/
+Disallow: /admin
+
+# Sitemap location
+Sitemap: https://andresai.aduquehd.com/sitemap.xml

@@ -2,6 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      name="description"
+      content="AndresAI Agent - An intelligent AI assistant developed by aduquehd. Chat with AndresAI for help with coding, writing, analysis, and various tasks. Powered by advanced language models."
+    />
+    <meta
+      name="keywords"
+      content="AndresAI, AndresAI Agent, aduquehd, AI assistant, chatbot, artificial intelligence, language model, coding help, AI chat"
+    />
+    <meta name="author" content="aduquehd" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://andresai.aduquehd.com" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#0a0a0f" />
 
     {% if settings.ga_tracking_id %}
     <!-- Google tag (gtag.js) -->
@@ -21,13 +36,13 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content"
     />
-    <title>AndresAI Agent</title>
+    <title>AndresAI Agent by aduquehd - Intelligent AI Assistant</title>
 
     <!-- Open Graph meta tags for social media sharing -->
-    <meta property="og:title" content="AndresAI Agent" />
+    <meta property="og:title" content="AndresAI Agent by aduquehd - Intelligent AI Assistant" />
     <meta
       property="og:description"
-      content="Intelligent AI assistant powered by advanced language models. Chat with AndresAI for help with various tasks."
+      content="AndresAI Agent by aduquehd - An intelligent AI assistant powered by advanced language models. Get help with coding, writing, analysis, and more through natural conversation."
     />
     <meta property="og:image" content="{{ url_for('static', path='/imgs/aduquehd-logo-sm.png') }}" />
     <meta property="og:type" content="website" />
@@ -35,10 +50,10 @@
 
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="AndresAI Agent" />
+    <meta name="twitter:title" content="AndresAI Agent by aduquehd - Intelligent AI Assistant" />
     <meta
       name="twitter:description"
-      content="Intelligent AI assistant powered by advanced language models. Chat with AndresAI for help with various tasks."
+      content="AndresAI Agent by aduquehd - An intelligent AI assistant powered by advanced language models. Get help with coding, writing, analysis, and more through natural conversation."
     />
     <meta name="twitter:image" content="{{ url_for('static', path='/imgs/aduquehd-logo-sm.png') }}" />
 
@@ -55,6 +70,37 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="{{ url_for('static', path='/css/chat-app.css') }}" />
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "AndresAI Agent",
+        "alternateName": "AndresAI",
+        "description": "AndresAI Agent by aduquehd - An intelligent AI assistant powered by advanced language models. Get help with coding, writing, analysis, and more through natural conversation.",
+        "url": "https://andresai.aduquehd.com",
+        "applicationCategory": "Utility",
+        "operatingSystem": "Web Browser",
+        "creator": {
+          "@type": "Person",
+          "name": "aduquehd",
+          "email": "aduquehd@gmail.com",
+          "url": "https://www.aduquehd.com",
+          "sameAs": ["https://linkedin.com/in/aduquehd", "https://github.com/aduquehd"]
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5",
+          "ratingCount": "1"
+        }
+      }
+    </script>
   </head>
   <body>
     <div class="app-container">
@@ -86,6 +132,7 @@
         <div class="header-content">
           <div class="title-section">
             <h1 class="app-title">AndresAI</h1>
+            <p class="app-subtitle">AI Assistant by aduquehd</p>
           </div>
           <div class="social-links">
             <div class="email-container">

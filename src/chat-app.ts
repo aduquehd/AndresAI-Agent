@@ -5,8 +5,8 @@ import { marked } from "https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.0/lib
 const renderer = new marked.Renderer();
 const originalLinkRenderer = renderer.link.bind(renderer);
 renderer.link = (href: string, title: string | null, text: string) => {
-    const html = originalLinkRenderer(href, title, text);
-    return html.replace('<a ', '<a target="_blank" rel="noopener noreferrer" ');
+  const html = originalLinkRenderer(href, title, text);
+  return html.replace("<a ", '<a target="_blank" rel="noopener noreferrer" ');
 };
 marked.setOptions({ renderer });
 

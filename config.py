@@ -16,5 +16,8 @@ class Settings(BaseSettings):
     # Analytics
     ga_tracking_id: str | None = None
 
+    # ipapi
+    ipapi_secret_key: str | None = None
+
 
 settings = Settings()

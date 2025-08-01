@@ -1,6 +1,8 @@
 import logfire
 import requests
 
+from config import settings
+
 
 def get_geographic_data(ip_address: str) -> dict:
     """Get geographic information from IP address using ipapi.co (free tier)."""
@@ -12,8 +14,11 @@ def get_geographic_data(ip_address: str) -> dict:
         return {"country": None, "region": None, "city": None}
 
     try:
-        # Use ipapi.co free service (1000 requests/month, no API key needed)
-        response = requests.get(f"https://ipapi.co/{ip_address}/json/", timeout=3)
+        url = f"https://ipapi.co/{ip_address}/json/"
+        if settings.ipapi_secret_key:
+            url += f"?key={settings.ipapi_secret_key}"
+
+        response = requests.get(url, timeout=3)
         if response.status_code == 200:
             data = response.json()
             return {

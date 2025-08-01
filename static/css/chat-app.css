@@ -216,6 +216,16 @@ body::before {
   animation: titleGlow 2s ease-in-out infinite alternate;
 }
 
+.app-subtitle {
+  font-family: "Exo 2", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  margin-top: 0.3rem;
+  opacity: 0.8;
+}
+
 .status-indicator {
   display: flex;
   align-items: center;
@@ -1227,7 +1237,6 @@ body::before {
   .portfolio-link:active {
     transform: translateY(0);
   }
-
 
   .status-text {
     display: none;
