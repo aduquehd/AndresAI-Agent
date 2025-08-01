@@ -17,7 +17,7 @@ def get_geographic_data(ip_address: str) -> dict:
 
     try:
         url = f"https://ipapi.co/{ip_address}/json/"
-        if settings.ipapi_secret_key:
+        if settings.ipapi_secret_api_key:
             url += f"?key={settings.ipapi_secret_key}"
 
         response = requests.get(url, timeout=3)
