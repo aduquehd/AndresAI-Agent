@@ -209,6 +209,16 @@ Username: chat_user
 Password: (from your .env file)
 ```
 
+### 📊 Data Management
+
+#### Populate Geographic Data
+
+To populate geographic data for existing users:
+
+```bash
+docker compose run --rm backend uv run python -m scripts.populate_user_geo_data
+```
+
 ## 🎯 Configuring the Agent
 
 The knowledge base powers your AI agent's contextual understanding. Manage it through the admin panel at `/admin`.

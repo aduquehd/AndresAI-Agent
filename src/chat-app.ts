@@ -17,6 +17,7 @@ const spinner = document.getElementById("spinner") as HTMLDivElement | null;
 const errorElement = document.getElementById("error") as HTMLDivElement | null;
 const newChatBtn = document.getElementById("new-chat-btn") as HTMLButtonElement | null;
 const formElement = document.querySelector("form") as HTMLFormElement | null;
+const themeToggle = document.getElementById("theme-toggle") as HTMLButtonElement | null;
 
 // Constants
 const STORAGE_KEY = "chat_user_id";
@@ -335,8 +336,44 @@ async function handleSubmit(e: SubmitEvent): Promise<void> {
   await sendMessage(prompt);
 }
 
+// Theme Management
+const THEME_KEY = "chat_theme";
+
+function getStoredTheme(): string {
+  return localStorage.getItem(THEME_KEY) || "dark";
+}
+
+function setTheme(theme: string): void {
+  const root = document.documentElement;
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+
+  if (theme === "light") {
+    root.setAttribute("data-theme", "light");
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute("content", "#ffffff");
+    }
+  } else {
+    root.removeAttribute("data-theme");
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute("content", "#0a0a0f");
+    }
+  }
+
+  localStorage.setItem(THEME_KEY, theme);
+}
+
+function toggleTheme(): void {
+  const currentTheme = getStoredTheme();
+  const newTheme = currentTheme === "dark" ? "light" : "dark";
+  setTheme(newTheme);
+}
+
 // Initialize
 function initialize(): void {
+  // Initialize theme
+  const storedTheme = getStoredTheme();
+  setTheme(storedTheme);
+
   // Initialize state
   state.userId = getUserId();
   state.browserId = getBrowserId();
@@ -352,6 +389,10 @@ function initialize(): void {
 
   if (newChatBtn) {
     newChatBtn.addEventListener("click", startNewChat);
+  }
+
+  if (themeToggle) {
+    themeToggle.addEventListener("click", toggleTheme);
   }
 
   // Load chat history
