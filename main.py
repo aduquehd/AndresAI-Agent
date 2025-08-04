@@ -18,6 +18,7 @@ from modules.admin.messages import AgentMessagesAdmin, MessagesAdmin
 from modules.admin.user import UserAdmin
 from modules.chats.routers import router as chats_router
 from modules.utils.database import engine
+from modules.utils.sentry import init_sentry
 
 
 async def create_db_and_tables():
@@ -26,6 +27,9 @@ async def create_db_and_tables():
 
 
 THIS_DIR = Path(__file__).parent
+
+# Initialize Sentry before creating the FastAPI app
+init_sentry()
 
 
 @asynccontextmanager

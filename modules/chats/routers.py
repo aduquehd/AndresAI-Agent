@@ -101,6 +101,8 @@ async def post_chat(
     prompt: Annotated[str, Form()],
     session: AsyncSession = Depends(get_session),
 ) -> StreamingResponse:
+    # Test sentry
+    1 / 0
     user = await get_user_by_username(session, user_id)
     now = datetime.now(timezone.utc)
     start_time = time.time()

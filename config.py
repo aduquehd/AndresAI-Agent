@@ -19,5 +19,8 @@ class Settings(BaseSettings):
     # ipapi
     ipapi_secret_api_key: str | None = None
 
+    # Sentry
+    sentry_dsn: str | None = None
+
 
 settings = Settings()
