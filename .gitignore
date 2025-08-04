@@ -271,11 +271,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Compiled TypeScript
-static/js/
-# But allow hand-written JavaScript in dist
-!static/dist/
-
 # Environment variables and secrets
 .env
 .env.local
@@ -298,3 +293,8 @@ caddy-config/
 *.bak
 *.backup
 
+# TypeScript compiled output
+static/js/*
+
+# CSS copied from frontend/src/css
+static/css/*
