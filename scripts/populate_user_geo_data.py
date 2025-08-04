@@ -1,5 +1,10 @@
 import asyncio
+import sys
 from datetime import datetime
+from pathlib import Path
+
+# Add the parent directory to the Python path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
