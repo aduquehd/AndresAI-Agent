@@ -3,6 +3,23 @@ import requests
 from config import settings
 
 
+def _is_private_172_range(ip_address: str) -> bool:
+    """Check if IP is in the private 172.16.0.0/12 range (172.16.0.0 - 172.31.255.255)."""
+    if not ip_address.startswith("172."):
+        return False
+
+    try:
+        parts = ip_address.split(".")
+        if len(parts) != 4:
+            return False
+
+        second_octet = int(parts[1])
+        # Private range is 172.16.x.x to 172.31.x.x
+        return 16 <= second_octet <= 31
+    except (ValueError, IndexError):
+        return False
+
+
 def get_geographic_data(ip_address: str) -> dict:
     """Get geographic information from IP address using ipapi.co (free tier)."""
     # Check for private/local IP addresses
@@ -10,7 +27,7 @@ def get_geographic_data(ip_address: str) -> dict:
         ip_address in ["unknown", "127.0.0.1", "::1"]
         or ip_address.startswith("192.168.")
         or ip_address.startswith("10.")
-        or ip_address.startswith("172.")  # Docker and private networks
+        or _is_private_172_range(ip_address)
     ):
         print(f"  Skipping private/local IP: {ip_address}")
         return {"country": None, "region": None, "city": None}
