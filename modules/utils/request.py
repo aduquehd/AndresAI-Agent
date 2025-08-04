@@ -3,6 +3,11 @@ from fastapi import Request
 
 def get_client_ip(request: Request) -> str:
     """Extract client IP address, handling proxies and load balancers."""
+    # Check CF-Connecting-IP header (Cloudflare proxy)
+    cf_connecting_ip = request.headers.get("CF-Connecting-IP")
+    if cf_connecting_ip:
+        return cf_connecting_ip.strip()
+
     # Check X-Forwarded-For header (common with proxies/load balancers)
     forwarded_for = request.headers.get("X-Forwarded-For")
     if forwarded_for:
