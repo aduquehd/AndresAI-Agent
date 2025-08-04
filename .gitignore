@@ -272,9 +272,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # Compiled TypeScript
-static/js/
+#static/js/
 # But allow hand-written JavaScript in dist
-!static/dist/
+#!static/dist/
 
 # Environment variables and secrets
 .env
