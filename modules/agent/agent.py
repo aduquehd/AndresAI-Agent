@@ -15,7 +15,7 @@ logfire.configure(send_to_logfire="if-token-present")
 logfire.instrument_asyncpg()
 
 agent = Agent(
-    "openai:gpt-4o",
+    "openai:gpt-5",
     deps_type=Deps,
     instrument=True,
 )
