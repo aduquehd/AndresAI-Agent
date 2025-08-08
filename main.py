@@ -4,9 +4,10 @@ from pathlib import Path
 import logfire
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi_limiter import FastAPILimiter
 from sqladmin import Admin
 from sqlmodel import SQLModel
 
@@ -18,6 +19,7 @@ from modules.admin.messages import AgentMessagesAdmin, MessagesAdmin
 from modules.admin.user import UserAdmin
 from modules.chats.routers import router as chats_router
 from modules.utils.database import engine
+from modules.utils.redis import init_redis
 from modules.utils.sentry import init_sentry
 
 
@@ -35,11 +37,17 @@ init_sentry()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # await create_db_and_tables()
+
+    # Initialize Redis and FastAPI Limiter
+    redis_client = await init_redis()
+    await FastAPILimiter.init(redis_client)
+
     yield
+    # Cleanup on shutdown
+    await FastAPILimiter.close()
 
 
 app = FastAPI(lifespan=lifespan)
-
 
 admin = Admin(app, engine, authentication_backend=authentication_backend, title="Chat Agent Admin")
 

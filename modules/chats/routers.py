@@ -6,6 +6,7 @@ from typing import Annotated
 import logfire
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, Request
 from fastapi.responses import Response, StreamingResponse
+from fastapi_limiter.depends import RateLimiter
 from openai import AsyncOpenAI
 from pydantic_ai.messages import (
     ModelMessage,
@@ -26,6 +27,7 @@ from modules.utils.agent import Deps, to_chat_message
 from modules.utils.auth import get_user_id_from_auth_header
 from modules.utils.database import get_session
 from modules.utils.geo import get_geographic_data
+from modules.utils.rate_limit import get_client_ip_identifier
 from modules.utils.request import get_browser_id, get_client_ip, get_user_agent
 
 
@@ -63,7 +65,10 @@ async def _get_user_geo_data(
     return geo_data
 
 
-@router.get("/history")
+@router.get(
+    "/history",
+    dependencies=[Depends(RateLimiter(times=2, seconds=60, identifier=get_client_ip_identifier))],
+)
 async def get_chat(
     user_id: Annotated[str, Depends(get_user_id_from_auth_header)],
     session: AsyncSession = Depends(get_session),
@@ -93,7 +98,10 @@ async def get_chat(
     return Response(b"\n".join(lines), media_type="text/plain")
 
 
-@router.post("/send")
+@router.post(
+    "/send",
+    dependencies=[Depends(RateLimiter(times=2, seconds=60, identifier=get_client_ip_identifier))],
+)
 async def post_chat(
     request: Request,
     background_tasks: BackgroundTasks,

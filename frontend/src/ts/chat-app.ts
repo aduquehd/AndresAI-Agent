@@ -1,6 +1,9 @@
 // @ts-ignore - External ES module
 import { marked } from "https://cdnjs.cloudflare.com/ajax/libs/marked/15.0.0/lib/marked.esm.js";
 
+// Declare Notyf as global (loaded via script tag)
+declare const Notyf: any;
+
 // Configure marked to open links in new tabs
 const renderer = new marked.Renderer();
 const originalLinkRenderer = renderer.link.bind(renderer);
@@ -14,10 +17,20 @@ marked.setOptions({ renderer });
 const convElement = document.getElementById("conversation") as HTMLDivElement | null;
 const promptInput = document.getElementById("prompt-input") as HTMLInputElement | null;
 const spinner = document.getElementById("spinner") as HTMLDivElement | null;
-const errorElement = document.getElementById("error") as HTMLDivElement | null;
 const newChatBtn = document.getElementById("new-chat-btn") as HTMLButtonElement | null;
 const formElement = document.querySelector("form") as HTMLFormElement | null;
 const themeToggle = document.getElementById("theme-toggle") as HTMLButtonElement | null;
+
+// Initialize Notyf with default styles
+const notyf = new Notyf({
+  duration: 6000,
+  position: {
+    x: 'right',
+    y: 'top',
+  },
+  dismissible: true,
+  ripple: true,
+});
 
 // Constants
 const STORAGE_KEY = "chat_user_id";
@@ -39,6 +52,12 @@ interface ChatState {
   browserId: string;
   isLoading: boolean;
   hasMessages: boolean;
+}
+
+interface RateLimitError {
+  error: string;
+  message: string;
+  retry_after: number;
 }
 
 // State management
@@ -117,20 +136,30 @@ function setLoadingState(loading: boolean): void {
   }
 }
 
-function showError(error: Error): void {
-  console.error("Chat error:", error);
-
-  if (errorElement) {
-    errorElement.classList.remove("d-none");
+function showError(error: Error | string, customMessage?: string, suppressConsole = false): void {
+  // Only log to console if not suppressed (e.g., for rate limiting)
+  if (!suppressConsole) {
+    console.error("Chat error:", error);
   }
+
+  let message: string;
+  
+  if (customMessage) {
+    message = customMessage;
+  } else if (typeof error === "string") {
+    message = error;
+  } else {
+    message = error.message || "An error occurred. Please try again.";
+  }
+
+  // Show error notification using Notyf
+  notyf.error(message);
 
   setLoadingState(false);
 }
 
-function clearError(): void {
-  if (errorElement) {
-    errorElement.classList.add("d-none");
-  }
+function showSuccess(message: string): void {
+  notyf.success(message);
 }
 
 // Chat UI Functions
@@ -207,10 +236,37 @@ function parseMessages(responseText: string): Message[] {
     .filter((msg): msg is Message => msg !== null);
 }
 
+async function handleApiError(response: Response): Promise<never> {
+  const errorText = await response.text();
+  
+  // Handle rate limiting specifically
+  if (response.status === 429) {
+    try {
+      const rateLimitError: RateLimitError = JSON.parse(errorText);
+      const retryAfter = rateLimitError.retry_after || 60;
+      const minutes = Math.ceil(retryAfter / 60);
+      const errorMessage = `Rate limit exceeded. Please wait ${minutes} minute${minutes > 1 ? 's' : ''} before sending another message.`;
+      throw new Error(errorMessage);
+    } catch (parseError) {
+      throw new Error("Too many requests. Please wait a moment and try again.");
+    }
+  }
+  
+  // Handle other HTTP errors
+  if (response.status === 500) {
+    throw new Error("Server error. Please try again later.");
+  } else if (response.status === 503) {
+    throw new Error("Service temporarily unavailable. Please try again later.");
+  } else if (response.status >= 400 && response.status < 500) {
+    throw new Error(`Request failed: ${errorText || response.statusText}`);
+  } else {
+    throw new Error(`Server error (${response.status}): ${errorText || response.statusText}`);
+  }
+}
+
 async function streamResponse(response: Response): Promise<void> {
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`Server error: ${response.status} - ${errorText}`);
+    await handleApiError(response);
   }
 
   if (!response.body) {
@@ -271,7 +327,6 @@ async function streamResponse(response: Response): Promise<void> {
 }
 
 async function sendMessage(content: string): Promise<void> {
-  clearError();
   setLoadingState(true);
 
   const formData = new FormData();
@@ -290,8 +345,14 @@ async function sendMessage(content: string): Promise<void> {
       promptInput.value = "";
     }
   } catch (error) {
-    showError(error instanceof Error ? error : new Error("Unknown error"));
-    throw error;
+    if (error instanceof Error) {
+      // Check if it's a rate limit error based on the message
+      const isRateLimitError = error.message.includes("Rate limit") || error.message.includes("Too many requests");
+      showError(error, error.message, isRateLimitError);
+    } else {
+      showError(new Error("Failed to send message"));
+    }
+    // Don't throw to prevent console errors - error is already shown to user
   } finally {
     setLoadingState(false);
   }
@@ -304,6 +365,11 @@ async function loadChatHistory(): Promise<void> {
     const response = await fetch(API_ENDPOINTS.chatHistory, {
       headers: createAuthHeaders(),
     });
+
+    if (!response.ok) {
+      // Always handle API errors, including rate limiting
+      await handleApiError(response);
+    }
 
     const responseText = await response.text();
 
@@ -320,7 +386,14 @@ async function loadChatHistory(): Promise<void> {
 
     setLoadingState(false);
   } catch (error) {
-    showError(error instanceof Error ? error : new Error("Failed to load chat history"));
+    // Show all errors to the user
+    if (error instanceof Error) {
+      // Check if it's a rate limit error based on the message
+      const isRateLimitError = error.message.includes("Rate limit") || error.message.includes("Too many requests");
+      showError(error, error.message, isRateLimitError);
+    } else {
+      showError(new Error("Failed to load chat history"));
+    }
   }
 }
 
@@ -382,7 +455,12 @@ function initialize(): void {
   if (formElement) {
     formElement.addEventListener("submit", (e) => {
       handleSubmit(e).catch((error) => {
-        showError(error instanceof Error ? error : new Error("Failed to send message"));
+        // Error is already handled in sendMessage
+        // Don't log rate limit errors to console
+        const isRateLimitError = error?.message?.includes("Rate limit") || error?.message?.includes("Too many requests");
+        if (!isRateLimitError) {
+          console.error("Submit error:", error);
+        }
       });
     });
   }
@@ -397,7 +475,11 @@ function initialize(): void {
 
   // Load chat history
   loadChatHistory().catch((error) => {
-    console.error("Failed to load chat history:", error);
+    // Don't log rate limit errors to console
+    const isRateLimitError = error?.message?.includes("Rate limit") || error?.message?.includes("Too many requests");
+    if (!isRateLimitError) {
+      console.error("Failed to load chat history:", error);
+    }
   });
 }
 

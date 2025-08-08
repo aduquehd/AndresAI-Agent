@@ -66,7 +66,11 @@
       href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
+    <!-- Notyf CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
     <link rel="stylesheet" href="{{ url_for('static', path='/css/chat-app.css') }}" />
+    <!-- Notyf JS (loaded as global) -->
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
     <!-- Structured Data for SEO -->
     <script type="application/ld+json">
@@ -269,8 +273,6 @@
             </button>
           </div>
         </form>
-
-        <div id="error" class="error-message">SYSTEM ERROR: AI connection failed :(</div>
       </main>
     </div>
 
