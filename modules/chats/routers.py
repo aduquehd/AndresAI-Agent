@@ -67,7 +67,7 @@ async def _get_user_geo_data(
 
 @router.get(
     "/history",
-    dependencies=[Depends(RateLimiter(times=2, seconds=60, identifier=get_client_ip_identifier))],
+    dependencies=[Depends(RateLimiter(times=100, seconds=60, identifier=get_client_ip_identifier))],
 )
 async def get_chat(
     user_id: Annotated[str, Depends(get_user_id_from_auth_header)],
@@ -100,7 +100,7 @@ async def get_chat(
 
 @router.post(
     "/send",
-    dependencies=[Depends(RateLimiter(times=2, seconds=60, identifier=get_client_ip_identifier))],
+    dependencies=[Depends(RateLimiter(times=30, seconds=60, identifier=get_client_ip_identifier))],
 )
 async def post_chat(
     request: Request,
