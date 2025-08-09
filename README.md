@@ -40,6 +40,7 @@
 - 🐳 **Dockerized** - Full container orchestration
 - 📈 **Scalable** - Async architecture with FastAPI
 - 🔧 **Configurable** - Environment-based configuration
+- ⚡ **Rate Limiting** - Built-in API throttling with Redis
 
 </td>
 </tr>
@@ -105,6 +106,12 @@ POSTGRES_USER=chat_user
 POSTGRES_PASSWORD=your_secure_password
 POSTGRES_DB=chat_agent_db
 
+# 🚦 Redis Configuration (for rate limiting)
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_DB=0
+# REDIS_PASSWORD=your_redis_password_if_needed
+
 # 👤 FastAPI Admin
 ADMIN_USER=admin
 ADMIN_PASSWORD='your_secure_admin_password'
@@ -152,6 +159,35 @@ CREATE EXTENSION IF NOT EXISTS vector;
 </td>
 </tr>
 </table>
+
+## 🚦 API Rate Limiting
+
+The application implements intelligent rate limiting to ensure fair usage and prevent abuse:
+
+### Rate Limits
+
+| Endpoint | Limit | Window | Description |
+|----------|-------|--------|-------------|
+| `/api/chats/history` | 100 requests | 60 seconds | Retrieve chat history |
+| `/api/chats/send` | 30 requests | 60 seconds | Send messages to the AI |
+
+### Features
+
+- **🔴 Redis-powered** - Fast, distributed rate limiting using Redis
+- **🔐 IP-based tracking** - Limits are applied per IP address (supports CloudFlare and proxies)
+- **📱 User-friendly errors** - Clear messages with retry-after information
+- **🔄 Automatic recovery** - Limits reset automatically after the time window
+
+### Error Handling
+
+When rate limits are exceeded:
+- **HTTP 429 Status** - "Too Many Requests" response
+- **Retry-After Header** - Indicates when the client can retry
+- **User Notification** - Frontend displays friendly error messages without console spam
+
+### Configuration
+
+Rate limiting is automatically configured with the Redis settings in your `.env` file. No additional configuration needed!
 
 ## 💻 Development
 
@@ -268,6 +304,12 @@ DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat
 POSTGRES_USER=chat_user
 POSTGRES_PASSWORD=your_secure_password
 POSTGRES_DB=chat_agent_db
+
+# 🚦 Redis Configuration (for rate limiting)
+REDIS_HOST=redis
+REDIS_PORT=6379
+REDIS_DB=0
+# REDIS_PASSWORD=your_redis_password_if_needed
 
 # 👤 FastAPI Admin
 ADMIN_USER=admin
