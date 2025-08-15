@@ -215,7 +215,10 @@ async def post_chat(
         media_type="text/plain",
         headers={
             "X-Accel-Buffering": "no",
-            "Cache-Control": "no-cache",
-            "Connection": "keep-alive"
+            "Cache-Control": "no-cache, no-transform",
+            "Connection": "keep-alive",
+            # CloudFlare specific headers to disable buffering
+            "CF-Cache-Status": "DYNAMIC",
+            "CF-Cache-Level": "bypass"
         }
     )
