@@ -210,4 +210,12 @@ async def post_chat(
         )
         await add_message(session, new_message)
 
-    return StreamingResponse(stream_messages(), media_type="text/plain")
+    return StreamingResponse(
+        stream_messages(), 
+        media_type="text/plain",
+        headers={
+            "X-Accel-Buffering": "no",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive"
+        }
+    )
