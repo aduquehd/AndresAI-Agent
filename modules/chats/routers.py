@@ -38,7 +38,6 @@ async def _get_user_geo_data(
     user: User | None,
     client_ip: str,
     background_tasks: BackgroundTasks,
-    session: AsyncSession,
 ) -> dict[str, str | None]:
     """Get or update user geographic data.
 
@@ -51,7 +50,12 @@ async def _get_user_geo_data(
         if not any([user.country, user.region, user.city]):
             geo_data = get_geographic_data(client_ip)
             background_tasks.add_task(
-                update_user_and_messages_geo_background, user, geo_data, session
+                update_user_and_messages_geo_background,
+                user.id,
+                user.country,
+                user.region,
+                user.city,
+                geo_data,
             )
         else:
             geo_data = {
@@ -117,7 +121,7 @@ async def post_chat(
     user_agent = get_user_agent(request)
     browser_id = get_browser_id(request)
 
-    geo_data = await _get_user_geo_data(user, client_ip, background_tasks, session)
+    geo_data = await _get_user_geo_data(user, client_ip, background_tasks)
 
     if not user:
         user = User(
@@ -211,7 +215,7 @@ async def post_chat(
         await add_message(session, new_message)
 
     return StreamingResponse(
-        stream_messages(), 
+        stream_messages(),
         media_type="text/plain",
         headers={
             "X-Accel-Buffering": "no",
@@ -219,6 +223,6 @@ async def post_chat(
             "Connection": "keep-alive",
             # CloudFlare specific headers to disable buffering
             "CF-Cache-Status": "DYNAMIC",
-            "CF-Cache-Level": "bypass"
-        }
+            "CF-Cache-Level": "bypass",
+        },
     )
