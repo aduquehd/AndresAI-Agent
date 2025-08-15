@@ -1,5 +1,7 @@
 andres-ai.aduquehd.com {
     reverse_proxy backend:8000 {
         flush_interval -1
+        header_up X-Accel-Buffering no
+        header_down X-Accel-Buffering no
     }
 }
