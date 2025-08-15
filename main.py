@@ -4,14 +4,12 @@ from pathlib import Path
 import logfire
 from fastapi import FastAPI, Request
 from fastapi.exceptions import HTTPException
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi_limiter import FastAPILimiter
 from sqladmin import Admin
 from sqlmodel import SQLModel
-from uvicorn.middleware.proxy_headers import ProxyHeadersMiddleware
 
 from config import settings
 from modules.admin.agent import AgentContextAdmin
@@ -50,10 +48,6 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
-
-# Add middleware to handle proxy headers correctly
-app.add_middleware(ProxyHeadersMiddleware, trusted_hosts=["*"])
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=["localhost", "127.0.0.1", "backend"])
 
 admin = Admin(app, engine, authentication_backend=authentication_backend, title="Chat Agent Admin")
 
