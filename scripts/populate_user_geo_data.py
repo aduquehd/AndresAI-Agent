@@ -75,9 +75,9 @@ async def main():
                 else:
                     failed_count += 1
 
-                # Stay under ipapi.co's free-tier rate limit. Cached IPs
-                # skip the API entirely, so this only matters when the
-                # batch contains many distinct, never-seen IPs.
+                # Stay under ipquery.io's rate limit. Cached IPs skip
+                # the API entirely, so this only matters when the batch
+                # contains many distinct, never-seen IPs.
                 await asyncio.sleep(0.5)
 
             print("\n--- Summary ---")

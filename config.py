@@ -24,9 +24,6 @@ class Settings(BaseSettings):
     # Analytics
     ga_tracking_id: str | None = None
 
-    # ipapi
-    ipapi_secret_api_key: str | None = None
-
     # Sentry
     sentry_dsn: str | None = None
 
