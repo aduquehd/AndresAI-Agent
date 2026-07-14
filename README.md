@@ -7,14 +7,15 @@
 </a>
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![Pydantic AI](https://img.shields.io/badge/Pydantic%20AI-E92063?style=for-the-badge&logo=pydantic&logoColor=white)](https://ai.pydantic.dev/)
+[![Anthropic](https://img.shields.io/badge/Claude-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://www.anthropic.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
 
-**FastAPI backend for the AndresAI chat assistant — streaming chat, RAG over pgvector, and a JSON admin API.**
+**FastAPI backend for the AndresAI chat assistant — streaming chat, RAG over pgvector, real-time admin events, and a JSON admin API.**
 
-[Companion repo](#-companion-repo) • [Features](#-features) • [Quick Start](#-quick-start) • [API](#-api-endpoints) • [Deployment](#-deployment)
+[Companion repo](#-companion-repo) • [Features](#-features) • [Quick Start](#-quick-start) • [Authentication](#-authentication) • [API](#-api-endpoints) • [Deployment](#-deployment) • [Contributing](#-contributing)
 
 </div>
 
@@ -37,17 +38,19 @@ The two communicate over HTTPS. The frontend points at this API via `NEXT_PUBLIC
 
 ### 🚀 Core
 - 🤖 **Streaming chat** — newline-delimited JSON over HTTP
-- 🔍 **Semantic search** — vector embeddings with pgvector
-- 📊 **Admin JSON API** — CRUD over users, messages, knowledge base, agent contexts
-- 🧠 **Pydantic AI** — typed agent + tool calls
+- 🧠 **Model-agnostic agent** — [Pydantic AI](https://ai.pydantic.dev/) with typed tool calls; defaults to Anthropic Claude, swappable via `AGENT_MODEL`
+- 🔍 **Semantic search (RAG)** — vector embeddings with pgvector, auto re-embedded on save
+- 📊 **Admin JSON API** — dashboard stats, conversations, users, messages, knowledge base, agent contexts
+- 📡 **Real-time admin events** — WebSocket stream pushes live updates to the admin UI
 
 </td>
 <td>
 
 ### 🛡️ Production
-- 🔒 **JWT admin auth** — httpOnly cookie, `SameSite=None; Secure` for cross-origin
+- 🔒 **JWT admin auth** — httpOnly cookie, `SameSite=None; Secure` for cross-origin; WebSocket handshake reuses the same cookie
 - 🐳 **Dockerized** — local + prod compose files, Caddy in front
 - ⚡ **Rate limiting** — Redis-backed, per-IP, with CloudFlare/proxy support
+- 🌍 **Geo enrichment** — visitor geolocation via ipquery.io, cached
 - 📈 **Observability** — Logfire + optional Sentry
 
 </td>
@@ -57,7 +60,8 @@ The two communicate over HTTPS. The frontend points at this API via `NEXT_PUBLIC
 ## 📋 Prerequisites
 
 - Docker & Docker Compose
-- An OpenAI API key
+- An **Anthropic API key** (the default agent model is Claude) — or set `AGENT_MODEL` to any [Pydantic AI-supported model](https://ai.pydantic.dev/models/) and provide that provider's key
+- An **OpenAI API key** — used for embeddings (`text-embedding-3-small`) that power the RAG knowledge base
 - (For the full chat experience) the [frontend repo](https://github.com/aduquehd/andres-ai-agent-app) running and pointed at this API
 
 ## 🚀 Quick Start
@@ -74,7 +78,8 @@ cd AndresAI-Agent
 ```bash
 cp .env.example .env
 # Edit .env — at minimum set:
-#   OPENAI_API_KEY, POSTGRES_PASSWORD, ADMIN_PASSWORD,
+#   ANTHROPIC_API_KEY (agent), OPENAI_API_KEY (embeddings),
+#   POSTGRES_PASSWORD, ADMIN_PASSWORD,
 #   FASTAPI_ADMIN_SECRET_KEY (32+ chars), FRONTEND_ORIGINS
 ```
 
@@ -82,11 +87,18 @@ cp .env.example .env
 <summary>📝 <b>Environment variables</b> (click to expand)</summary>
 
 ```dotenv
-# 🔑 OpenAI API
+# 🔑 LLM providers
+# The agent runs on Claude by default (see AGENT_MODEL below).
+ANTHROPIC_API_KEY=sk-ant-your-anthropic-api-key-here
+# OpenAI is required for RAG embeddings (text-embedding-3-small).
 OPENAI_API_KEY=sk-proj-your-openai-api-key-here
+# Optional — only if you switch AGENT_MODEL to a Gemini model.
+# GOOGLE_API_KEY=your-google-api-key-here
 
-# 📊 Logfire (optional - observability)
-LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
+# 🧠 Agent / RAG (optional overrides — defaults shown)
+# Any Pydantic AI model string works, e.g. openai:gpt-5, google-gla:gemini-2.5-pro
+# AGENT_MODEL=anthropic:claude-sonnet-4-6
+# EMBEDDING_MODEL=text-embedding-3-small
 
 # 🗄️ Database
 DB_CONNECTION_STRING=postgresql+asyncpg://chat_user:your_secure_password@db/chat_agent_db
@@ -94,7 +106,7 @@ POSTGRES_USER=chat_user
 POSTGRES_PASSWORD=your_secure_password
 POSTGRES_DB=chat_agent_db
 
-# 🚦 Redis (rate limiting)
+# 🚦 Redis (rate limiting + realtime)
 REDIS_HOST=redis
 REDIS_PORT=6379
 REDIS_DB=0
@@ -112,9 +124,10 @@ FRONTEND_ORIGINS=http://localhost:3000,https://your-vercel-domain.vercel.app
 APP_ENV=development
 DEBUG=false
 
-# 📈 Optional
-GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
+# 📈 Optional — observability & analytics
+LOGFIRE_TOKEN=pylf_v1_us_your-logfire-token-here
 SENTRY_DSN=https://your-project-id@o0.ingest.sentry.io/0
+GA_TRACKING_ID=G-YOUR-TRACKING-ID-HERE
 ```
 
 </details>
@@ -151,6 +164,30 @@ pnpm dev
 
 The API is now at <http://localhost:8000>, the chat at <http://localhost:3000/>, and the admin at <http://localhost:3000/admin>.
 
+## 🔐 Authentication
+
+Two independent mechanisms, one per audience:
+
+### Chat users (anonymous, UUID-based)
+
+Chat visitors are identified by client-generated UUIDs — no signup. The frontend stores them in `localStorage` and sends them on every request:
+
+```
+Authorization: User-Id <uuid>
+X-Browser-Id: <uuid>
+```
+
+Unknown UUIDs are auto-registered on first message; geo data is derived from the client IP (CloudFlare/proxy-aware) and backfilled asynchronously.
+
+### Admin (JWT in an httpOnly cookie)
+
+1. `POST /api/admin/login` with username/password (constant-time comparison against `ADMIN_USER`/`ADMIN_PASSWORD`).
+2. The API sets an `admin_session` httpOnly cookie containing an HS256 JWT (12 h TTL), signed with `FASTAPI_ADMIN_SECRET_KEY`.
+3. The cookie uses `SameSite=None; Secure` so it survives the cross-origin flow from the Vercel-hosted admin UI.
+4. All `/api/admin/*` endpoints require the cookie; the **WebSocket** at `/api/admin/ws` authenticates the same way — the browser sends the cookie on the handshake, and unauthenticated connections are closed with code `4401`.
+
+CORS is restricted to the origins in `FRONTEND_ORIGINS`, with credentials allowed.
+
 ## 🌐 API Endpoints
 
 ### Chat API (consumed by the Next.js chat at `/`)
@@ -158,26 +195,36 @@ The API is now at <http://localhost:8000>, the chat at <http://localhost:3000/>,
 | Method | Path                 | Description                                      | Rate limit  |
 |--------|----------------------|--------------------------------------------------|-------------|
 | `GET`  | `/api/chats/history` | Chat history for the authenticated UUID user     | 100/min/IP  |
-| `POST` | `/api/chats/send`    | Send a message; streams newline-delimited JSON   | 30/min/IP   |
-
-Auth headers (CORS allows credentials):
-- `Authorization: User-Id <uuid>`
-- `X-Browser-Id: <uuid>`
+| `POST` | `/api/chats/send`    | Send a message (form field `prompt`); streams newline-delimited JSON | 30/min/IP   |
 
 ### Admin API (consumed by the Next.js admin at `/admin`)
 
-| Method                  | Path                          | Description                                 |
-|-------------------------|-------------------------------|---------------------------------------------|
-| `POST`                  | `/api/admin/login`            | Username/password → sets httpOnly JWT cookie |
-| `POST`                  | `/api/admin/logout`           | Clears the JWT cookie                        |
-| `GET`                   | `/api/admin/me`               | Returns current admin session info           |
-| `GET/POST/PATCH/DELETE` | `/api/admin/users`            |                                              |
-| `GET/POST/PATCH/DELETE` | `/api/admin/messages`         |                                              |
-| `GET/POST/PATCH/DELETE` | `/api/admin/agent-messages`   |                                              |
-| `GET/POST/PATCH/DELETE` | `/api/admin/knowledge-base`   | Regenerates the embedding on save            |
-| `GET/POST/PATCH/DELETE` | `/api/admin/agent-contexts`   |                                              |
+**Session**
 
-The admin cookie is set with `SameSite=None; Secure` so it survives the cross-origin admin flow from Vercel.
+| Method | Path                | Description                                   |
+|--------|---------------------|-----------------------------------------------|
+| `POST` | `/api/admin/login`  | Username/password → sets httpOnly JWT cookie  |
+| `POST` | `/api/admin/logout` | Clears the JWT cookie                         |
+| `GET`  | `/api/admin/me`     | Returns current admin session info            |
+| `WS`   | `/api/admin/ws`     | Real-time event stream (auth via JWT cookie)  |
+
+**Data**
+
+| Method                  | Path                                | Description                                    |
+|-------------------------|-------------------------------------|------------------------------------------------|
+| `GET`                   | `/api/admin/dashboard/stats`        | Dashboard metrics; `messages_range` = `this_month`, `30d`, `60d`, `90d`, `all` |
+| `GET`                   | `/api/admin/users`                  | List users                                     |
+| `GET`                   | `/api/admin/users/{id}`             | User detail                                    |
+| `GET`                   | `/api/admin/users/{id}/stats`       | Per-user stats                                 |
+| `DELETE`                | `/api/admin/users/{id}`             | Delete user (cascades to their messages)       |
+| `GET`                   | `/api/admin/conversations`          | Conversation list grouped per user             |
+| `GET`                   | `/api/admin/messages`               | List messages                                  |
+| `GET`                   | `/api/admin/messages/countries`     | Message counts by country                      |
+| `GET`/`DELETE`          | `/api/admin/messages/{id}`          |                                                |
+| `GET`                   | `/api/admin/agent-messages`         | Pydantic AI message lists per user             |
+| `GET`/`DELETE`          | `/api/admin/agent-messages/{id}`    |                                                |
+| `GET/POST/PATCH/DELETE` | `/api/admin/knowledge-base`         | RAG entries — regenerates the embedding on save |
+| `GET/POST/PATCH/DELETE` | `/api/admin/agent-contexts`         | Agent system-prompt context entries            |
 
 ## 🚦 Rate limiting
 
@@ -187,15 +234,17 @@ Redis-backed, per-IP, with CloudFlare/proxy `X-Forwarded-For` support. Limits re
 
 ```
 modules/
-├── admin/            JSON CRUD routes consumed by the Next.js admin UI
+├── admin/            JSON CRUD routes + WebSocket event broadcaster (realtime.py)
 ├── agent/            Pydantic AI agent, tools, models
 ├── chats/            Chat endpoints + streaming
 ├── knowledge_base/   RAG over pgvector (auto-embed on save)
 ├── users/            User accounts
-└── utils/            Shared: auth, database, agent, rate limiting
+└── utils/            Shared: auth, database, embeddings, geo, rate limiting, redis
 ```
 
 Key models live in `modules/*/models.py`: `User`, `AgentMessage`, `Message`, `KnowledgeBase`, `AgentContext`.
+
+The agent (`modules/agent/agent.py`) is a Pydantic AI `Agent` with a dynamic system prompt loaded from the `AgentContext` table and a `search_knowledge_base` tool that does semantic search over the pgvector-indexed knowledge base.
 
 ## 💻 Development
 
@@ -235,7 +284,7 @@ docker compose run --rm backend uv run python -m scripts.populate_user_geo_data
 
 ## 🎯 Configuring the agent
 
-The knowledge base powers the agent's RAG context. Manage it from the admin panel at `/admin/knowledge-base` (frontend).
+The knowledge base powers the agent's RAG context. Manage it from the admin panel at `/admin/knowledge-base` (frontend). The agent's static persona/system prompt lives in the `AgentContext` table, editable at `/admin/agent-contexts`.
 
 <details>
 <summary>📚 <b>Knowledge base example</b> (click to expand)</summary>
@@ -331,6 +380,26 @@ docker compose -f docker-compose.prod.yml up
 ```
 
 </details>
+
+## 🤝 Contributing
+
+Contributions are welcome! To get started:
+
+1. **Fork** the repository and create a feature branch (`git checkout -b feat/my-feature`).
+2. Follow the [Quick Start](#-quick-start) to get a local stack running.
+3. Make your changes. Before committing, format and lint:
+   ```bash
+   docker compose run --rm backend uv run ruff format .
+   docker compose run --rm backend uv run ruff check . --fix
+   ```
+4. If you change models, generate a migration (`alembic revision --autogenerate`) and include it.
+5. **Open a pull request** describing what changed and why.
+
+For bugs and feature ideas, please [open an issue](https://github.com/aduquehd/AndresAI-Agent/issues).
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
