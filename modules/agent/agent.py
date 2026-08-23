@@ -1,6 +1,6 @@
 import pydantic_core
 from pydantic_ai import Agent, RunContext
-from pydantic_ai.agent import InstrumentationCap
+from pydantic_ai.capabilities import Instrumentation
 
 from config import settings
 from modules.agent.services import get_agent_context
@@ -13,7 +13,8 @@ from modules.utils.embeddings import embed_query
 agent = Agent(
     settings.agent_model,
     deps_type=Deps,
-    capabilities=[InstrumentationCap()],
+    capabilities=[Instrumentation()],
+    defer_model_check=True,
 )
 
 

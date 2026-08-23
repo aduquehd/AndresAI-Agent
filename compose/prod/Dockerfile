@@ -11,6 +11,6 @@ ENV UV_PROJECT_ENVIRONMENT="/usr/local"
 
 ADD . /app
 
-RUN uv sync
+RUN uv sync --frozen --no-dev
 
 EXPOSE 8000

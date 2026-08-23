@@ -10,7 +10,7 @@ FastAPI backend for the AndresAI chat assistant. Provides streaming chat endpoin
 
 - **Backend**: FastAPI, SQLModel, Pydantic AI
 - **Database**: PostgreSQL with pgvector extension
-- **Cache/Rate Limiting**: Redis with fastapi-limiter
+- **Cache/Rate Limiting**: Redis with pyrate-limiter (per-IP buckets, see `modules/utils/rate_limit.py`)
 - **Containerization**: Docker Compose
 - **Package Manager**: uv (Python)
 - **Code Quality**: Ruff for linting/formatting
@@ -37,6 +37,9 @@ docker compose run --rm backend uv run alembic revision --autogenerate -m "descr
 # Lint and format Python code
 uv run ruff check .
 uv run ruff format .
+
+# Unit tests (no live LLM calls)
+uv run pytest
 
 # API base URL (local): http://localhost:8000
 ```

@@ -9,8 +9,8 @@ _redis_client: redis.Redis | None = None
 async def get_redis_url() -> str:
     """Get Redis connection URL."""
     redis_host = os.getenv("REDIS_HOST", "redis")
-    redis_port = int(os.getenv("REDIS_PORT", 6379))
-    redis_db = int(os.getenv("REDIS_DB", 0))
+    redis_port = int(os.getenv("REDIS_PORT", "6379"))
+    redis_db = int(os.getenv("REDIS_DB", "0"))
     redis_password = os.getenv("REDIS_PASSWORD")
 
     if redis_password:

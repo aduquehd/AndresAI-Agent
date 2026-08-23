@@ -15,7 +15,7 @@
 
 **FastAPI backend for the AndresAI chat assistant — streaming chat, RAG over pgvector, real-time admin events, and a JSON admin API.**
 
-[Companion repo](#-companion-repo) • [Features](#-features) • [Quick Start](#-quick-start) • [Authentication](#-authentication) • [API](#-api-endpoints) • [Deployment](#-deployment) • [Contributing](#-contributing)
+[Companion repo](#-companion-repo) • [Features](#-features) • [Screenshots](#-screenshots) • [Quick Start](#-quick-start) • [Authentication](#-authentication) • [API](#-api-endpoints) • [Deployment](#-deployment) • [Contributing](#-contributing)
 
 </div>
 
@@ -56,6 +56,34 @@ The two communicate over HTTPS. The frontend points at this API via `NEXT_PUBLIC
 </td>
 </tr>
 </table>
+
+## 📸 Screenshots
+
+The [Next.js frontend](https://github.com/aduquehd/andres-ai-agent-app) consuming this API:
+
+### Chat
+
+The cyberpunk-themed chat UI streaming an answer about open source projects:
+
+![Chat UI](docs/screenshots/chat.png)
+
+### Admin — Dashboard
+
+Live usage stats, latency percentiles, throughput charts, and geography:
+
+![Admin dashboard](docs/screenshots/admin-dashboard.png)
+
+### Admin — Conversations
+
+One row per user with message counts, last activity, and a preview of the last message:
+
+![Admin conversations](docs/screenshots/admin-conversations.png)
+
+### Admin — Conversation detail
+
+Clicking a row opens the full thread with per-user metadata (latency, client, IP, geo):
+
+![Admin conversation detail](docs/screenshots/admin-conversation-detail.png)
 
 ## 📋 Prerequisites
 

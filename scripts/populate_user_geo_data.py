@@ -1,6 +1,7 @@
+#!/usr/bin/env python
 import asyncio
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -90,5 +91,5 @@ async def main():
 
 if __name__ == "__main__":
     print("Starting geographic data population...")
-    print(f"Timestamp: {datetime.now()}")
+    print(f"Timestamp: {datetime.now(UTC)}")
     asyncio.run(main())

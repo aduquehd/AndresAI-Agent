@@ -19,7 +19,7 @@ Production:
 import argparse
 import asyncio
 import sys
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 
@@ -209,7 +209,7 @@ async def _upsert(session, title: str, content: str, force: bool) -> str:
 
 async def main(force: bool) -> None:
     print(f"Seeding {len(ENTRIES)} '{CATEGORY.value}' KB entries (force={force})")
-    print(f"Started: {datetime.now().isoformat(timespec='seconds')}\n")
+    print(f"Started: {datetime.now(UTC).isoformat(timespec='seconds')}\n")
 
     counts = {"created": 0, "updated": 0, "skipped": 0}
     async with async_session() as session:

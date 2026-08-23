@@ -1,21 +1,11 @@
 import json
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 
 import logfire
 from fastapi import APIRouter, BackgroundTasks, Depends, Form, Request
 from fastapi.responses import Response, StreamingResponse
-from fastapi_limiter.depends import RateLimiter
-from pydantic_ai import Agent
-from pydantic_ai.messages import (
-    ModelMessage,
-    ModelMessagesTypeAdapter,
-    PartDeltaEvent,
-    PartStartEvent,
-    TextPart,
-    TextPartDelta,
-)
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -23,14 +13,15 @@ from modules.admin.realtime import publish_message_created, publish_user_created
 from modules.agent.agent import agent
 from modules.chats.models import AgentMessage, Message, MessageDirectionEnum
 from modules.chats.services import add_agent_message, add_message
+from modules.chats.stream import iter_streamed_text
 from modules.chats.utils.geo import backfill_user_and_messages_geo
 from modules.users.models import User
 from modules.users.services import create_user, get_user_by_username
-from modules.utils.agent import Deps, to_chat_message
+from modules.utils.agent import Deps, chat_messages_from_history, load_model_messages
 from modules.utils.auth import get_user_id_from_auth_header
 from modules.utils.database import get_session
 from modules.utils.geo import get_geographic_data
-from modules.utils.rate_limit import get_client_ip_identifier
+from modules.utils.rate_limit import RateLimiter, get_client_ip_identifier
 from modules.utils.request import get_browser_id, get_client_ip, get_user_agent
 
 
@@ -84,16 +75,8 @@ async def get_chat(
     result = await session.exec(query)
     messages = result.all()
 
-    list_messages: list[ModelMessage] = []
-    for message in messages:
-        list_messages.extend(ModelMessagesTypeAdapter.validate_json(message.message_list))
-
-    lines = []
-    for message in list_messages:
-        chat_msg = to_chat_message(message)
-        if chat_msg:
-            json_str = json.dumps(chat_msg)
-            lines.append(json_str.encode("utf-8"))
+    chat_messages = chat_messages_from_history([message.message_list for message in messages])
+    lines = [json.dumps(chat_msg).encode("utf-8") for chat_msg in chat_messages]
 
     return Response(b"\n".join(lines), media_type="text/plain")
 
@@ -110,7 +93,7 @@ async def post_chat(
     session: AsyncSession = Depends(get_session),
 ) -> StreamingResponse:
     user = await get_user_by_username(session, user_id)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     start_time = time.time()
 
     client_ip = get_client_ip(request)
@@ -139,7 +122,7 @@ async def post_chat(
             json.dumps(
                 {
                     "role": "user",
-                    "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+                    "timestamp": datetime.now(tz=UTC).isoformat(),
                     "content": prompt,
                 }
             ).encode("utf-8")
@@ -152,10 +135,7 @@ async def post_chat(
         result = await session.exec(query)
         messages = result.all()
 
-        list_messages: list[ModelMessage] = []
-        for message in messages:
-            list_messages.extend(ModelMessagesTypeAdapter.validate_json(message.message_list))
-
+        list_messages = load_model_messages([message.message_list for message in messages])
         deps = Deps(session=session)
 
         # Stream via agent.iter() so text emitted before AND after tool calls is
@@ -166,45 +146,20 @@ async def post_chat(
         # frontend treats them as updates to the same message bubble rather
         # than separate messages.
         accumulated_text = ""
-        new_message_json = b""
-        stream_timestamp = datetime.now(tz=timezone.utc).isoformat()
+        stream_timestamp = datetime.now(tz=UTC).isoformat()
 
         async with agent.iter(prompt, message_history=list_messages, deps=deps) as agent_run:
-            async for node in agent_run:
-                if Agent.is_model_request_node(node):
-                    async with node.stream(agent_run.ctx) as request_stream:
-                        async for event in request_stream:
-                            is_new_text_part = False
-                            delta = None
-                            if isinstance(event, PartStartEvent):
-                                if isinstance(event.part, TextPart):
-                                    is_new_text_part = True
-                                    delta = event.part.content
-                            elif isinstance(event, PartDeltaEvent):
-                                if isinstance(event.delta, TextPartDelta):
-                                    delta = event.delta.content_delta
-
-                            if not delta:
-                                continue
-
-                            if (
-                                is_new_text_part
-                                and accumulated_text
-                                and not accumulated_text.endswith("\n\n")
-                            ):
-                                accumulated_text += "\n\n"
-                            accumulated_text += delta
-
-                            yield (
-                                json.dumps(
-                                    {
-                                        "role": "model",
-                                        "timestamp": stream_timestamp,
-                                        "content": accumulated_text,
-                                    }
-                                ).encode("utf-8")
-                                + b"\n"
-                            )
+            async for accumulated_text in iter_streamed_text(agent_run):
+                yield (
+                    json.dumps(
+                        {
+                            "role": "model",
+                            "timestamp": stream_timestamp,
+                            "content": accumulated_text,
+                        }
+                    ).encode("utf-8")
+                    + b"\n"
+                )
 
             new_message_json = agent_run.result.new_messages_json()
         agent_message = AgentMessage(
@@ -215,7 +170,7 @@ async def post_chat(
         # Calculate response time
         end_time = time.time()
         response_time_ms = int((end_time - start_time) * 1000)
-        end_datetime = datetime.now(timezone.utc)
+        end_datetime = datetime.now(UTC)
 
         # Save user message (outgoing)
         outgoing = Message(

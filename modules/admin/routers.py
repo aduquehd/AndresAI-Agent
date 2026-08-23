@@ -2,7 +2,7 @@
 
 import asyncio
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Annotated, Any
 
 import jwt
@@ -134,7 +134,7 @@ async def admin_ws(websocket: WebSocket) -> None:
         pass
     except asyncio.CancelledError:
         raise
-    except Exception:  # noqa: BLE001
+    except Exception:
         log.exception("admin ws: send loop crashed")
     finally:
         await broadcaster.unsubscribe(queue)
@@ -159,7 +159,9 @@ def _resolve_messages_range(
     elif messages_range == "90d":
         start = today_start - timedelta(days=89)
     else:  # "all"
-        start = earliest.replace(hour=0, minute=0, second=0, microsecond=0) if earliest else today_start
+        start = (
+            earliest.replace(hour=0, minute=0, second=0, microsecond=0) if earliest else today_start
+        )
     day_count = max(1, (today_start.date() - start.date()).days + 1)
     return start, day_count
 
@@ -177,17 +179,13 @@ async def dashboard_stats(
     """
     if messages_range not in MESSAGES_RANGES:
         messages_range = "all"
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
 
     # ----- Totals (one query each, count) -----
     users_total = int((await session.exec(select(func.count()).select_from(User))).one())
-    messages_total = int(
-        (await session.exec(select(func.count()).select_from(Message))).one()
-    )
-    kb_total = int(
-        (await session.exec(select(func.count()).select_from(KnowledgeBase))).one()
-    )
+    messages_total = int((await session.exec(select(func.count()).select_from(Message))).one())
+    kb_total = int((await session.exec(select(func.count()).select_from(KnowledgeBase))).one())
     agent_ctx_total = int(
         (await session.exec(select(func.count()).select_from(AgentContext))).one()
     )
@@ -196,9 +194,7 @@ async def dashboard_stats(
     messages_today = int(
         (
             await session.exec(
-                select(func.count())
-                .select_from(Message)
-                .where(Message.created_at >= today_start)
+                select(func.count()).select_from(Message).where(Message.created_at >= today_start)
             )
         ).one()
     )
@@ -219,14 +215,10 @@ async def dashboard_stats(
             )
         )
     ).one()
-    avg_latency_today = (
-        float(avg_latency_today_row) if avg_latency_today_row is not None else None
-    )
+    avg_latency_today = float(avg_latency_today_row) if avg_latency_today_row is not None else None
 
     # ----- Messages per day for the selected range, split by direction -----
-    earliest = (
-        await session.exec(select(func.min(Message.created_at)))
-    ).one()
+    earliest = (await session.exec(select(func.min(Message.created_at)))).one()
     range_start, day_count = _resolve_messages_range(messages_range, today_start, earliest)
     day_col = cast(Message.created_at, Date).label("day")
     rows = (
@@ -253,9 +245,7 @@ async def dashboard_stats(
         d = (range_start + timedelta(days=i)).date()
         key = d.isoformat()
         b = buckets.get(key, {"incoming": 0, "outgoing": 0})
-        messages_by_day.append(
-            {"date": key, "incoming": b["incoming"], "outgoing": b["outgoing"]}
-        )
+        messages_by_day.append({"date": key, "incoming": b["incoming"], "outgoing": b["outgoing"]})
 
     # ----- Top countries (top 10 by message count) -----
     country_rows = (
@@ -267,16 +257,12 @@ async def dashboard_stats(
             .limit(10)
         )
     ).all()
-    messages_by_country = [
-        {"country": c, "count": int(n)} for c, n in country_rows if c
-    ]
+    messages_by_country = [{"country": c, "count": int(n)} for c, n in country_rows if c]
 
     # ----- Overall direction split -----
     direction_rows = (
         await session.exec(
-            select(Message.direction, func.count().label("count")).group_by(
-                Message.direction
-            )
+            select(Message.direction, func.count().label("count")).group_by(Message.direction)
         )
     ).all()
     direction_split = {"incoming": 0, "outgoing": 0}
@@ -291,15 +277,9 @@ async def dashboard_stats(
             await session.exec(
                 select(
                     func.avg(Message.response_time_ms),
-                    func.percentile_cont(0.5).within_group(
-                        Message.response_time_ms.asc()
-                    ),
-                    func.percentile_cont(0.95).within_group(
-                        Message.response_time_ms.asc()
-                    ),
-                    func.percentile_cont(0.99).within_group(
-                        Message.response_time_ms.asc()
-                    ),
+                    func.percentile_cont(0.5).within_group(Message.response_time_ms.asc()),
+                    func.percentile_cont(0.95).within_group(Message.response_time_ms.asc()),
+                    func.percentile_cont(0.99).within_group(Message.response_time_ms.asc()),
                 ).where(Message.response_time_ms.is_not(None))
             )
         ).one()
@@ -512,9 +492,7 @@ async def get_user_stats(
 
 
 @router.delete("/users/{user_id}", dependencies=[Depends(require_admin)])
-async def delete_user(
-    user_id: int, session: Annotated[AsyncSession, Depends(get_session)]
-) -> dict:
+async def delete_user(user_id: int, session: Annotated[AsyncSession, Depends(get_session)]) -> dict:
     """Delete a user and cascade-remove all their messages and agent messages."""
     user = await session.get(User, user_id)
     if not user:
@@ -522,9 +500,7 @@ async def delete_user(
     messages_deleted = int(
         (
             await session.exec(
-                select(func.count())
-                .select_from(Message)
-                .where(Message.user_id == user_id)
+                select(func.count()).select_from(Message).where(Message.user_id == user_id)
             )
         ).one()
     )
@@ -928,12 +904,7 @@ async def list_agent_contexts(
     offset: int = 0,
 ) -> dict[str, Any]:
     limit = _clamp_limit(limit)
-    stmt = (
-        select(AgentContext)
-        .order_by(AgentContext.created_at.desc())
-        .offset(offset)
-        .limit(limit)
-    )
+    stmt = select(AgentContext).order_by(AgentContext.created_at.desc()).offset(offset).limit(limit)
     rows = (await session.exec(stmt)).all()
     total = await _count(session, AgentContext)
     return {
@@ -962,7 +933,7 @@ async def create_agent_context(
     item = AgentContext(
         status=payload.status,
         agent_prompt=payload.agent_prompt,
-        created_at=datetime.now(tz=timezone.utc),
+        created_at=datetime.now(tz=UTC),
     )
     session.add(item)
     await session.commit()
