@@ -1,7 +1,7 @@
 """Admin authentication using JWT issued as an httpOnly cookie."""
 
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 import jwt
@@ -28,7 +28,7 @@ def verify_admin_credentials(username: str, password: str) -> bool:
 
 def create_admin_token(username: str) -> str:
     """Issue a JWT for an authenticated admin session."""
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     payload = {
         "sub": username,
         "iat": int(now.timestamp()),

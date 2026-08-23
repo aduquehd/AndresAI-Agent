@@ -1,4 +1,5 @@
 import json
+from itertools import pairwise
 from unittest.mock import AsyncMock
 
 from pydantic_ai.messages import (
@@ -49,7 +50,7 @@ async def test_iter_streamed_text_text_only(system_prompt: str, kb_search: Async
 
     assert chunks
     assert chunks[-1] == "Hello world from Andres"
-    for previous, current in zip(chunks, chunks[1:]):
+    for previous, current in pairwise(chunks):
         assert current.startswith(previous) or previous in current
 
 

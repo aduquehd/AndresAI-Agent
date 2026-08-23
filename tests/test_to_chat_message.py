@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic_ai.messages import (
@@ -14,7 +14,7 @@ from pydantic_ai.run import AgentRunResult
 from modules.utils.agent import to_chat_message
 
 
-TS = datetime(2026, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
+TS = datetime(2026, 1, 15, 12, 0, 0, tzinfo=UTC)
 
 
 def test_user_prompt_becomes_user_chat_message():

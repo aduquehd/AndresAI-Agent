@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 
 from sqlalchemy import TIMESTAMP, Enum as SqlEnum
@@ -21,7 +21,7 @@ class AgentMessage(SQLModel, table=True):
     user_id: int = Field(default=None, foreign_key="users.id")
 
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         sa_type=TIMESTAMP(timezone=True),
     )
 
@@ -47,7 +47,7 @@ class Message(SQLModel, table=True):
     city: str | None = Field(default=None, max_length=100)  # City name
 
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         sa_type=TIMESTAMP(timezone=True),
     )
 

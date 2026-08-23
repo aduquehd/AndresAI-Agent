@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Literal
 
 from pydantic_ai.messages import (
@@ -50,7 +50,7 @@ def to_chat_message(m: ModelMessage | AgentRunResult) -> ChatMessage | None:
     elif isinstance(m, AgentRunResult):
         return {
             "role": "model",
-            "timestamp": datetime.now().isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "content": m.output,
         }
     else:

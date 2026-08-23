@@ -48,6 +48,9 @@ exclude = ["alembic/versions/*"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
+# FastAPI builds dependency injection on function calls in argument defaults
+# (Depends/Form/Query) - the exact pattern B008 exists to flag.
+ignore = ["B008"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["chat_agent"]  # Replace with your package/module name

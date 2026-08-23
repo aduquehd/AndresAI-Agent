@@ -1,6 +1,6 @@
 import json
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Annotated
 
 import logfire
@@ -93,7 +93,7 @@ async def post_chat(
     session: AsyncSession = Depends(get_session),
 ) -> StreamingResponse:
     user = await get_user_by_username(session, user_id)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     start_time = time.time()
 
     client_ip = get_client_ip(request)
@@ -122,7 +122,7 @@ async def post_chat(
             json.dumps(
                 {
                     "role": "user",
-                    "timestamp": datetime.now(tz=timezone.utc).isoformat(),
+                    "timestamp": datetime.now(tz=UTC).isoformat(),
                     "content": prompt,
                 }
             ).encode("utf-8")
@@ -146,7 +146,7 @@ async def post_chat(
         # frontend treats them as updates to the same message bubble rather
         # than separate messages.
         accumulated_text = ""
-        stream_timestamp = datetime.now(tz=timezone.utc).isoformat()
+        stream_timestamp = datetime.now(tz=UTC).isoformat()
 
         async with agent.iter(prompt, message_history=list_messages, deps=deps) as agent_run:
             async for accumulated_text in iter_streamed_text(agent_run):
@@ -170,7 +170,7 @@ async def post_chat(
         # Calculate response time
         end_time = time.time()
         response_time_ms = int((end_time - start_time) * 1000)
-        end_datetime = datetime.now(timezone.utc)
+        end_datetime = datetime.now(UTC)
 
         # Save user message (outgoing)
         outgoing = Message(

@@ -1,6 +1,5 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
-from typing import Optional
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import TIMESTAMP, Enum as SqlEnum
@@ -17,7 +16,7 @@ class KnowledgeBase(SQLModel, table=True):
     __tablename__ = "knowledge_base"
     __table_args__ = {"extend_existing": True}
 
-    id: Optional[int] = Field(default=None, primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     type: KnowledgeBaseTypeEnum = Field(
         sa_column=Column(SqlEnum(KnowledgeBaseTypeEnum), nullable=False)
     )
@@ -26,6 +25,6 @@ class KnowledgeBase(SQLModel, table=True):
     embedding: list[float] = Field(sa_column=Column(Vector(1536), nullable=True))
 
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         sa_type=TIMESTAMP(timezone=True),
     )

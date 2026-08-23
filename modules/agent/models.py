@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import TIMESTAMP, Text
 from sqlmodel import Field, SQLModel
@@ -13,6 +13,6 @@ class AgentContext(SQLModel, table=True):
     agent_prompt: str | None = Field(None, sa_type=Text)
 
     created_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc),
+        default_factory=lambda: datetime.now(UTC),
         sa_type=TIMESTAMP(timezone=True),
     )
