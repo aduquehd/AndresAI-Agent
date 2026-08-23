@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 import logfire
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi_limiter import FastAPILimiter
 
 from config import settings
 from modules.admin.routers import router as admin_router
@@ -18,10 +17,8 @@ init_sentry()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    redis_client = await init_redis()
-    await FastAPILimiter.init(redis_client)
+    await init_redis()
     yield
-    await FastAPILimiter.close()
     await close_redis()
 
 
