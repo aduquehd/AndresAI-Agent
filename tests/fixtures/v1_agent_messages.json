@@ -1,0 +1,55 @@
+[
+  {
+    "kind": "request",
+    "parts": [
+      {
+        "part_kind": "system-prompt",
+        "content": "You are Andres.",
+        "timestamp": "2026-01-15T12:00:00Z"
+      },
+      {
+        "part_kind": "user-prompt",
+        "content": "What are your hobbies?",
+        "timestamp": "2026-01-15T12:00:00Z"
+      }
+    ]
+  },
+  {
+    "kind": "response",
+    "timestamp": "2026-01-15T12:00:00Z",
+    "parts": [
+      {
+        "part_kind": "text",
+        "content": "Let me look that up."
+      },
+      {
+        "part_kind": "tool-call",
+        "tool_name": "search_knowledge_base",
+        "args": {"category": "hobbies", "search_query": "hobbies"},
+        "tool_call_id": "pyd_ai_legacy_tool_call_1"
+      }
+    ]
+  },
+  {
+    "kind": "request",
+    "parts": [
+      {
+        "part_kind": "tool-return",
+        "tool_name": "search_knowledge_base",
+        "content": "[{\"title\":\"Music\",\"content\":\"I play guitar\"}]",
+        "tool_call_id": "pyd_ai_legacy_tool_call_1",
+        "timestamp": "2026-01-15T12:00:01Z"
+      }
+    ]
+  },
+  {
+    "kind": "response",
+    "timestamp": "2026-01-15T12:00:02Z",
+    "parts": [
+      {
+        "part_kind": "text",
+        "content": "I enjoy playing guitar."
+      }
+    ]
+  }
+]

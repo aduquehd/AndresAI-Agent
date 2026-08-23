@@ -2,14 +2,15 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Literal
 
-from pydantic_ai.agent import AgentRunResult
 from pydantic_ai.messages import (
     ModelMessage,
+    ModelMessagesTypeAdapter,
     ModelRequest,
     ModelResponse,
     TextPart,
     UserPromptPart,
 )
+from pydantic_ai.run import AgentRunResult
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing_extensions import TypedDict
 
@@ -27,7 +28,7 @@ class ChatMessage(TypedDict):
     content: str
 
 
-def to_chat_message(m: ModelMessage) -> ChatMessage | dict | None:
+def to_chat_message(m: ModelMessage | AgentRunResult) -> ChatMessage | None:
     if isinstance(m, ModelRequest):
         for part in m.parts:
             if isinstance(part, UserPromptPart):
@@ -54,3 +55,21 @@ def to_chat_message(m: ModelMessage) -> ChatMessage | dict | None:
         }
     else:
         return None
+
+
+def load_model_messages(stored_json_lists: list[str]) -> list[ModelMessage]:
+    """Rehydrate stored AgentMessage.message_list rows into a single history."""
+    messages: list[ModelMessage] = []
+    for raw in stored_json_lists:
+        messages.extend(ModelMessagesTypeAdapter.validate_json(raw))
+    return messages
+
+
+def chat_messages_from_history(stored_json_lists: list[str]) -> list[ChatMessage]:
+    """Convert stored Pydantic AI message JSON into chat-UI payloads."""
+    chat_messages: list[ChatMessage] = []
+    for message in load_model_messages(stored_json_lists):
+        chat_msg = to_chat_message(message)
+        if chat_msg:
+            chat_messages.append(chat_msg)
+    return chat_messages
