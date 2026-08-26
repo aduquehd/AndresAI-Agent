@@ -34,7 +34,9 @@ jobs:
     if: inputs.image_tag == ''
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10
+      # setup-uv stopped publishing floating major tags after v7, so this is
+      # pinned to an exact release rather than a major.
+      - uses: astral-sh/setup-uv@v10.0.1
         with:
           enable-cache: true
       - run: uv sync --frozen
