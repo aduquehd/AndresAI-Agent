@@ -298,3 +298,6 @@ static/js/*
 
 # CSS copied from frontend/src/css
 static/css/*
+
+# Written by scripts/deploy.sh on the production host
+.deployed-image

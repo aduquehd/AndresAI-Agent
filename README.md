@@ -351,63 +351,51 @@ The backend deploys to your own server via Docker. The frontend deploys to Verce
 
 ### Deploy steps
 
+Deployment is automated. Every push to `main` triggers
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which:
+
+1. runs `ruff check`, `ruff format --check` and `pytest`;
+2. builds `compose/prod/Dockerfile` and pushes it to ECR tagged `sha-<commit>`;
+3. runs `scripts/deploy.sh` on the EC2 host via AWS SSM, which pulls that exact
+   image, applies Alembic migrations, and restarts the stack.
+
+The server holds no AWS keys and GitHub holds no SSH keys: both sides
+authenticate with short-lived credentials (GitHub OIDC into an IAM role, and an
+EC2 instance profile respectively).
+
+### First-time server setup
+
 ```bash
-# 1. Build production images
-docker compose -f docker-compose.prod.yml build
-
-# 2. Start the stack
-docker compose -f docker-compose.prod.yml up -d
-
-# 3. Enable pgvector (one-time)
+# Enable pgvector (one-time)
 docker exec -it andres-ai-agent_db psql -U chat_user -d chat_agent_db \
   -c "CREATE EXTENSION IF NOT EXISTS vector;"
-
-# 4. Apply migrations
-docker compose -f docker-compose.prod.yml run --rm backend uv run alembic upgrade head
 ```
 
-Caddy will serve the API on the domain configured in `compose/prod/Caddyfile`.
+The host also needs the AWS CLI, an instance profile granting
+`AmazonSSMManagedInstanceCore` + `AmazonEC2ContainerRegistryReadOnly`, and a
+production `.env` in `/home/ubuntu/AndresAI-Agent/` (never baked into the image).
 
-### Re-deployment
+### Rolling back
 
 ```bash
-source deploy-server.sh
+gh workflow run "Deploy production" -f image_tag=sha-1a2b3c4
 ```
 
-### Production with Supervisor (auto-restart)
+This redeploys that image *and* checks the config out at the same commit.
 
-<details>
-<summary>⚡ <b>Supervisor configuration</b> (click to expand)</summary>
+### Connecting to the production database
+
+Postgres is bound to `127.0.0.1` on the host, so open a tunnel rather than
+exposing the port. This needs the Session Manager plugin locally
+(`brew install --cask session-manager-plugin`):
 
 ```bash
-sudo apt install supervisor -y
-sudo nano /etc/supervisor/conf.d/ai_agent.conf
+aws ssm start-session --target <instance-id> \
+  --document-name AWS-StartPortForwardingSessionToRemoteHost \
+  --parameters '{"host":["localhost"],"portNumber":["5432"],"localPortNumber":["15432"]}'
 ```
 
-```ini
-[program:ai_agent]
-directory=/home/ubuntu/AndresAI-Agent
-command=sudo /usr/bin/docker compose -f docker-compose.prod.yml up
-autostart=true
-autorestart=true
-stderr_logfile=/var/log/ai_agent.err.log
-stdout_logfile=/var/log/ai_agent.out.log
-```
-
-```bash
-sudo supervisorctl reread
-sudo supervisorctl update
-sudo supervisorctl start ai_agent
-```
-
-Useful:
-```bash
-sudo tail -f /var/log/ai_agent.out.log
-sudo supervisorctl stop ai_agent
-docker compose -f docker-compose.prod.yml up
-```
-
-</details>
+Then connect a client to `localhost:15432`.
 
 ## 🤝 Contributing
 

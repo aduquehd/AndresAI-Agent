@@ -46,14 +46,24 @@ uv run pytest
 
 ### Production Deployment
 
-```bash
-# Quick deploy (uses deploy-server.sh)
-source deploy-server.sh
+Deploys are automatic: any push to `main` runs `.github/workflows/deploy.yml`,
+which lints, tests, builds the image, pushes it to ECR, and rolls it out to the
+EC2 host over SSM. There is nothing to run by hand.
 
-# Manual deploy
-docker compose -f docker-compose.prod.yml build
-docker compose -f docker-compose.prod.yml up
+```bash
+# Roll back to a previously built image (Actions -> Deploy production -> Run workflow)
+gh workflow run "Deploy production" -f image_tag=sha-1a2b3c4
+
+# What is running right now
+cat /home/ubuntu/AndresAI-Agent/.deployed-image   # on the server
 ```
+
+Notes:
+
+- The server pulls a SHA-pinned image; it no longer builds anything.
+- `git` on the server supplies config only (compose file, Caddyfile).
+- Postgres is bound to `127.0.0.1`. Reach it from a laptop with:
+  `aws ssm start-session --target <instance-id> --document-name AWS-StartPortForwardingSessionToRemoteHost --parameters '{"host":["localhost"],"portNumber":["5432"],"localPortNumber":["15432"]}'`
 
 ## Architecture
 
